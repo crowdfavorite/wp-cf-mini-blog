@@ -1,0 +1,46 @@
+.cfmb-inline-edit-col-d,
+.cfmb-inline-edit-col-e {
+	float: left;
+	width: 50%;
+}
+
+.cfmb-inp-group {
+	margin-bottom: 2px;
+}
+.cfmb-inp-group label {
+	color: #555;
+	display: block;
+	font: italic 12px/1.8em Georgia,"Times New Roman","Bitstream Charter",Times,serif;
+	margin: .2em 0;
+}
+.cfmb-inp-group.label-inline label {
+	display: inline;
+}
+.cfmb-inp-group textarea,
+.cfmb-inp-group input[type=text],
+.cfmb-inp-group input[type=password] {
+	width: 98%;
+}
+
+.cfmb-edit-img {
+	background: #666;
+	border: 3px solid #666;
+	-moz-border-radius: 3px; /* FF1+ */
+	-webkit-border-radius: 3px; /* Saf3+, Chrome */
+	-khtml-border-radius: 3px; /* Konqueror */
+	border-radius: 3px; /* Standard. IE9 */
+	display: block;
+	max-height: 150px;
+	overflow: hidden;
+	position: relative;
+	width: 150px;
+}
+.cfmb-edit-img a.delete-link {
+	background: url(../img/delete-img.png);
+	height: 20px;
+	position: absolute;
+	right: 0;
+	top: 0;
+	text-indent: -999em;
+	width: 20px;
+}
