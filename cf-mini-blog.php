@@ -716,12 +716,16 @@ class CF_Mini_Blog {
 					$leaderboard_code = stripslashes($_POST['leaderboard_code-'.$id]);
 					$analytics_code = stripslashes($_POST['analytics_code-'.$id]);
 					$exclude_on_home = empty($_POST['exclude_on_home-'.$id]) ? 0 : 1;
+					$dark_theme = empty($_POST['dark_theme-'.$id]) ? 0 : 1;
+					$image_only_excerpts = empty($_POST['image_only_excerpts-'.$id]) ? 0 : 1;
 					
 					$result = $this->save_mini_blog_meta($id, compact(
 						'leaderboard_code', 
 						'analytics_code', 
 						'thumbnail', 
-						'exclude_on_home'
+						'exclude_on_home',
+						'dark_theme',
+						'image_only_excerpts'
 					));
 					
 					if (!is_wp_error($result)) {

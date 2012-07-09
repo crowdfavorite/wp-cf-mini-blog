@@ -230,6 +230,14 @@ class CF_Mini_blog_List_Table extends WP_List_Table {
 								<input type="checkbox" value="1" name="exclude_on_home-<?php echo $item->term_id; ?>" id="exclude_on_home-<?php echo $item->term_id?>"<?php checked(1, $this->controller->get_mini_blog_meta($item->term_id, 'exclude_on_home')); ?> />
 								<label for="exclude_on_home-<?php echo $item->term_id; ?>"><?php echo esc_html('Exclude posts from Home Page?', 'cf_mini_blog'); ?></label>
 							</p>
+							<p class="cfmb-inp-group label-inline">
+								<input type="checkbox" value="1" name="dark_theme-<?php echo $item->term_id; ?>" id="dark_theme-<?php echo $item->term_id?>"<?php checked(1, $this->controller->get_mini_blog_meta($item->term_id, 'dark_theme')); ?> />
+								<label for="dark_theme-<?php echo $item->term_id; ?>"><?php echo esc_html('Use Dark Theme?', $this->i18n); ?></label>
+							</p>
+							<p class="cfmb-inp-group label-inline">
+								<input type="checkbox" value="1" name="image_only_excerpts-<?php echo $item->term_id; ?>" id="image_only_excerpts-<?php echo $item->term_id?>"<?php checked(1, $this->controller->get_mini_blog_meta($item->term_id, 'image_only_excerpts')); ?> />
+								<label for="image_only_excerpts-<?php echo $item->term_id; ?>"><?php echo esc_html('Use Image-only excerpts?', $this->i18n); ?></label>
+							</p>
 						</div>
 					</div>
 					
