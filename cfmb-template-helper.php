@@ -234,6 +234,16 @@ class CFMB_Template_Helper {
 	public function get_analytics_code() {
 		return $this->get_related_meta('analytics_code');
 	}
+
+	public function use_dark_theme() {
+		$meta = $this->get_related_meta('dark_theme');
+		return $meta == "1";
+	}
+
+	public function use_image_only_excerpt() {
+		$meta = $this->get_related_meta('image_only_excerpts');
+		return $meta == "1";
+	}
 	
 	public function render_analytics_code() {
 		echo $this->get_analytics_code();
