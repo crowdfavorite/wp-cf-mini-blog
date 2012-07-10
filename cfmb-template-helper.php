@@ -133,6 +133,10 @@ class CFMB_Template_Helper {
 		
 		return $this->related_sidebars;
 	}
+
+	public function get_all_mini_blogs() {
+		return $this->ins->get_mini_blogs();
+	}
 	
 	/**
 	 * Boolean formulation of get_related_sidebars().
