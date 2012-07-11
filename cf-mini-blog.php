@@ -103,6 +103,7 @@ class CF_Mini_Blog {
 			add_filter('plugin_action_links', array($this, 'plugin_action_links'), null, 2);
 			add_action('load-settings_page_'.$this->menu_page_slug, array($this, 'load_admin_page'));
 			add_action('add_meta_boxes_post', array($this, 'add_meta_box'), null, 1);
+			add_action('add_meta_boxes_page', array($this, 'add_meta_box_page'), null, 1);
 			add_action('save_post', array($this, 'save_mini_blog_assignment'), null, 2);
 		}
 	}
@@ -139,7 +140,10 @@ class CF_Mini_Blog {
 				'slug' => $this->taxonomy_slug
 			)
 		);
-		register_taxonomy($this->taxonomy, 'post', $args);
+		$types = array('post');
+		$types = apply_filters('cfmb_register_taxonomy_types', $types);
+		$args = apply_filters('cfmb_register_taxonomy_args', $args);
+		register_taxonomy($this->taxonomy, $types, $args);
 	}
 	
 	
@@ -177,6 +181,16 @@ class CF_Mini_Blog {
 	public function add_meta_box($post) {
 		add_meta_box('cfmb_mini_blogs', __('Mini-Blogs', 'cf_mini_blog'), array($this, 'output_mini_blogs_meta_box'), 'post', 'side');
 	}
+
+	/**
+	 * Register the Mini-Blogs meta box for the post-edit screen
+	 *
+	 * @param obj $post 
+	 * @return void
+	 */
+	public function add_meta_box_page($page) {
+		add_meta_box('cfmb_mini_blogs', __('Mini-Blogs', $this->i18n), array($this, 'output_mini_blogs_meta_box'), 'page', 'side');
+	}
 	
 	
 	/**
@@ -189,7 +203,15 @@ class CF_Mini_Blog {
 	public function output_mini_blogs_meta_box($post) {
 		// Get our post id
 		$id = is_object($post) && isset($post->ID) ? $post->ID : null;
+<<<<<<< HEAD
+||||||| merged common ancestors
+		
+		// Get the selected Mini-Blog
+=======
+		// Get the selected Mini-Blog
+>>>>>>> add page support for miniblogs
 		$selected = wp_get_post_terms($id, $this->taxonomy, array('fields' => 'ids'));
+<<<<<<< HEAD
 		$name = esc_attr('tax_input['.$this->taxonomy.'][]');
 		$terms = get_terms($this->taxonomy, array(
 			'hide_empty' => false,
@@ -233,6 +255,39 @@ class CF_Mini_Blog {
 					}
 				 ?>
 			</ul>
+||||||| merged common ancestors
+		$selected = is_array($selected) ? array_shift($selected) : 0;
+		?>
+		<div class="inside">
+			<p><?php _e('Select a Mini-Blog to associate to this post.', $this->i18n); ?></p>
+			<?php
+			// Dropdown of our Mini-Blogs that are active
+			wp_dropdown_categories(array(
+				'taxonomy' => $this->taxonomy,
+				'selected' => $selected,
+				'show_option_none' => __('&mdash; Please Select &mdash;', $this->i18n),
+				'name' => 'cfmb_mini_blog_dropdown',
+				'hide_empty' => false,
+				'exclude' => $this->get_inactive_mini_blogs(),
+			));
+			?>
+=======
+		$selected = is_array($selected) ? array_shift($selected) : 0;
+		?>
+		<div class="inside">
+			<p><?php _e('Select a Mini-Blog to associate', $this->i18n); ?></p>
+			<?php
+			// Dropdown of our Mini-Blogs that are active
+			wp_dropdown_categories(array(
+				'taxonomy' => $this->taxonomy,
+				'selected' => $selected,
+				'show_option_none' => __('&mdash; Please Select &mdash;', $this->i18n),
+				'name' => 'cfmb_mini_blog_dropdown',
+				'hide_empty' => false,
+				'exclude' => $this->get_inactive_mini_blogs(),
+			));
+			?>
+>>>>>>> add page support for miniblogs
 		</div>
 	</div>
 <?php 
@@ -267,7 +322,7 @@ class CF_Mini_Blog {
 	 * @return void
 	 */
 	public function save_mini_blog_assignment($post_id, $post) {
-		if ($post->post_type == 'post' && isset($_POST['cfmb_mini_blog_dropdown'])) {
+		if ($post->post_type == 'post' || $post->post_type == 'page' && isset($_POST['cfmb_mini_blog_dropdown'])) {
 			// sanitize the $_POST[]
 			$mb_id = intval($_POST['cfmb_mini_blog_dropdown']);
 			// Assign the term
