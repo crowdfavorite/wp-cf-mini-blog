@@ -1088,7 +1088,7 @@ class CF_Mini_Blog {
 	 *
 	 * @return array
 	 */
-	private function get_active_mini_blogs() {
+	public function get_active_mini_blogs() {
 		return (array) $this->get_setting('active_mini_blogs');
 	}
 	

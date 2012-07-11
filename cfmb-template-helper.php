@@ -134,8 +134,11 @@ class CFMB_Template_Helper {
 		return $this->related_sidebars;
 	}
 
-	public function get_all_mini_blogs() {
-		return $this->ins->get_mini_blogs();
+	public function get_all_mini_blogs($args = array(), $exclude_inactive = true) {
+		if ($exclude_inactive) {
+			$args['exclude'] = $this->ins->get_inactive_mini_blogs();
+		}
+		return $this->ins->get_mini_blogs($args);
 	}
 	
 	/**
