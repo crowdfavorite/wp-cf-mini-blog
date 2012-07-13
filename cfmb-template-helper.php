@@ -194,6 +194,15 @@ class CFMB_Template_Helper {
 		}
 		return '';
 	}
+
+	public function mini_blog_url() {
+		$terms = $this->get_related_terms();
+		$term = array_shift($terms);
+		if ($term) {
+			return get_term_link($term, $term->taxonomy);
+		}
+		return '';
+	}
 	
 	public function mini_blog_link() {
 		$terms = $this->get_related_terms();
