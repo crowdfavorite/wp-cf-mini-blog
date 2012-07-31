@@ -1,8 +1,8 @@
-<?php 
+<?php
 /*
 Plugin Name: CF Mini-Blog
-Plugin URI: 
-Description: Creates the ability to have specific blog elements (header image, sidebars, menus, etc.) created 
+Plugin URI:
+Description: Creates the ability to have specific blog elements (header image, sidebars, menus, etc.) created
 Version: 0.1
 Author: Crowd Favorite
 Author URI: http://crowdfavorite.com
@@ -11,7 +11,7 @@ Author URI: http://crowdfavorite.com
 /*
 * Admin listing of terms
 * Add Term
-* Activate 
+* Activate
 * Deactivate
 * Delete
 
@@ -35,16 +35,16 @@ Nice to Haves
 require_once('cfmb-template-helper.php');
 
 class CF_Mini_Blog {
-	
+
 	static $instance;
-	
+
 	var $ver = '0.1';
-	
+
 	public $term_sidebar_map = array();
 	public $term_menu_map = array();
-	
+
 	private function __construct() {
-		/* Define what our "action" is that we'll 
+		/* Define what our "action" is that we'll
 		listen for in our request handlers */
 		if (file_exists(trailingslashit(get_stylesheet_directory()).'plugins/'.basename(dirname(__FILE__)))) {
         		$this->url = trailingslashit(trailingslashit(get_stylesheet_directory_uri()).'plugins/'.basename(dirname(__FILE__)));
@@ -60,11 +60,11 @@ class CF_Mini_Blog {
 		$this->taxonomy_slug = 'blog';
 		$this->option_name = 'cf_mini_blog_settings';
 		$this->error_code = 'cf_mini_blog_error';
-		
+
 		// Menu Stuff
 		$this->menu_page_slug = 'cf_mini_blog';
 		$this->menu_page_url = add_query_arg(array('page' => $this->menu_page_slug), admin_url('options-general.php'));
-		
+
 		// Settings Format
 		$this->defaults = array(
 			'active_mini_blogs' => array(),
@@ -79,23 +79,23 @@ class CF_Mini_Blog {
 		}
 		return self::$instance;
 	}
-	
+
 	public function add_actions() {
 		// Register our taxonomy before other actions
 
 		add_action('init', array($this, 'register_taxonomy'), 0); // Same priority as create_initial_taxonomies()
-		add_action('init', array($this, 'register_post_type'), 1); 
-		
+		add_action('init', array($this, 'register_post_type'), 1);
+
 		// Register Sidebars for each Mini-Blog term
 		add_action('widgets_init', array($this, 'register_sidebars'));
 		add_action('widgets_init', array($this, 'register_menus'));
-		
+
 		// Exclude posts if necessary
 		add_action('pre_get_posts', array($this, 'maybe_filter_home_page_posts'));
-		
+
 		// Feed site URL should be mini blog URL
 		add_filter('get_bloginfo_rss', array($this, 'feed_link_filter'), 0, 2);
-		
+
 		if (is_admin()) {
 			add_action('init', array($this, 'admin_resource_handler'), 0);
 			add_action('init', array($this, 'admin_request_handler'));
@@ -107,7 +107,7 @@ class CF_Mini_Blog {
 			add_action('save_post', array($this, 'save_mini_blog_assignment'), null, 2);
 		}
 	}
-	
+
 	public function feed_link_filter($option_val, $option_name) {
 		if ($option_name == 'url' && is_tax($this->taxonomy)) {
 			//if is mini blog
@@ -117,10 +117,10 @@ class CF_Mini_Blog {
 				$option_val = $term_url;
 			}
 		}
-		
+
 		return $option_val;
 	}
-	
+
 	/**
 	 * Registers the cf_mini_blogs taxonomy
 	 *
@@ -145,15 +145,15 @@ class CF_Mini_Blog {
 		$args = apply_filters('cfmb_register_taxonomy_args', $args);
 		register_taxonomy($this->taxonomy, $types, $args);
 	}
-	
-	
+
+
 	/**
 	 * Register the Mini-Blogs post type, so that we can attach meta to the various Mini-Blogs
 	 *
 	 * @return void
 	 */
 	public function register_post_type() {
-		register_post_type($this->post_type, array( 
+		register_post_type($this->post_type, array(
 			'labels' => array(
 				'name' => __('Mini-Blogs', 'cf_mini_blog'),
 				'singular_name' => __('Mini-Blog', 'cf_mini_blog'),
@@ -170,12 +170,12 @@ class CF_Mini_Blog {
 			),
 		));
 	}
-	
-	
+
+
 	/**
 	 * Register the Mini-Blogs meta box for the post-edit screen
 	 *
-	 * @param obj $post 
+	 * @param obj $post
 	 * @return void
 	 */
 	public function add_meta_box($post) {
@@ -185,33 +185,27 @@ class CF_Mini_Blog {
 	/**
 	 * Register the Mini-Blogs meta box for the post-edit screen
 	 *
-	 * @param obj $post 
+	 * @param obj $post
 	 * @return void
 	 */
 	public function add_meta_box_page($page) {
 		add_meta_box('cfmb_mini_blogs', __('Mini-Blogs', $this->i18n), array($this, 'output_mini_blogs_meta_box'), 'page', 'side');
 	}
-	
-	
+
+
 	/**
-	 * Populate a metabox that allows the author to choose which Mini-Blogs 
+	 * Populate a metabox that allows the author to choose which Mini-Blogs
 	 * the post is associated with.
 	 *
-	 * @param object $post 
+	 * @param object $post
 	 * @return void
 	 */
 	public function output_mini_blogs_meta_box($post) {
 		// Get our post id
 		$id = is_object($post) && isset($post->ID) ? $post->ID : null;
-<<<<<<< HEAD
-||||||| merged common ancestors
-		
 		// Get the selected Mini-Blog
-=======
-		// Get the selected Mini-Blog
->>>>>>> add page support for miniblogs
+
 		$selected = wp_get_post_terms($id, $this->taxonomy, array('fields' => 'ids'));
-<<<<<<< HEAD
 		$name = esc_attr('tax_input['.$this->taxonomy.'][]');
 		$terms = get_terms($this->taxonomy, array(
 			'hide_empty' => false,
@@ -255,39 +249,6 @@ class CF_Mini_Blog {
 					}
 				 ?>
 			</ul>
-||||||| merged common ancestors
-		$selected = is_array($selected) ? array_shift($selected) : 0;
-		?>
-		<div class="inside">
-			<p><?php _e('Select a Mini-Blog to associate to this post.', $this->i18n); ?></p>
-			<?php
-			// Dropdown of our Mini-Blogs that are active
-			wp_dropdown_categories(array(
-				'taxonomy' => $this->taxonomy,
-				'selected' => $selected,
-				'show_option_none' => __('&mdash; Please Select &mdash;', $this->i18n),
-				'name' => 'cfmb_mini_blog_dropdown',
-				'hide_empty' => false,
-				'exclude' => $this->get_inactive_mini_blogs(),
-			));
-			?>
-=======
-		$selected = is_array($selected) ? array_shift($selected) : 0;
-		?>
-		<div class="inside">
-			<p><?php _e('Select a Mini-Blog to associate', $this->i18n); ?></p>
-			<?php
-			// Dropdown of our Mini-Blogs that are active
-			wp_dropdown_categories(array(
-				'taxonomy' => $this->taxonomy,
-				'selected' => $selected,
-				'show_option_none' => __('&mdash; Please Select &mdash;', $this->i18n),
-				'name' => 'cfmb_mini_blog_dropdown',
-				'hide_empty' => false,
-				'exclude' => $this->get_inactive_mini_blogs(),
-			));
-			?>
->>>>>>> add page support for miniblogs
 		</div>
 	</div>
 <?php 
@@ -312,13 +273,13 @@ class CF_Mini_Blog {
 		<?php
 		}
 	}
-	
-	
+
+
 	/**
 	 * Save the Mini-Blog selection for a post
 	 *
-	 * @param int $post_id 
-	 * @param obj $post 
+	 * @param int $post_id
+	 * @param obj $post
 	 * @return void
 	 */
 	public function save_mini_blog_assignment($post_id, $post) {
@@ -335,18 +296,18 @@ class CF_Mini_Blog {
 			update_post_meta($post_id, $this->primary_meta_key, $mb_id);
 		}
 	}
-	
+
 	/**
 	 * Set the terms for a post
-	 * 
-	 * @param int $post_id 
+	 *
+	 * @param int $post_id
 	 * @param int $mb_id
 	 * @return void
-	 */ 
+	 */
 	public function set_mini_blog_term($post_id, $mb_id) {
 		wp_set_post_terms($post_id, array($mb_id), $this->taxonomy);
 	}
-	
+
 	/**
 	 * Early request handler for the admin resources
 	 *
@@ -362,12 +323,12 @@ class CF_Mini_Blog {
 			}
 		}
 	}
-	
-	
+
+
 	/**
 	 * Wrapper function for getting all mini blogs
 	 *
-	 * @param array $args 
+	 * @param array $args
 	 * @return array
 	 */
 	public function get_mini_blogs($args = array()) {
@@ -375,17 +336,17 @@ class CF_Mini_Blog {
 		$defaults = array(
 			'hide_empty' 	=> false,
 		);
-		
+
 		// Get all the terms, we'll cut out the unwanteds later
  		$terms = get_terms($this->taxonomy, array_merge($defaults, $args));
 
 		// Only return arrays from this method
 		return is_array($terms) ? $terms : array();
 	}
-	
-	
+
+
 	/**
-	 * Just get all the Mini-Blog IDs 
+	 * Just get all the Mini-Blog IDs
 	 *
 	 * @return array - array of integers
 	 */
@@ -397,8 +358,8 @@ class CF_Mini_Blog {
 		}
 		return $ids;
 	}
-	
-	
+
+
 	/**
 	 * Loops over the active mini blogs, and creates a sidebar for each one
 	 *
@@ -417,11 +378,11 @@ class CF_Mini_Blog {
 			$sidebar_args['id'] 		 = 'mini-blog-sidebar-'.$mini_blog->slug; // @TODO this may be better suited as the term_id
 			$sidebar_args['description'] = sprintf(__('Sidebar for the "%s" Mini-Blog', 'cf_mini_blog'), $mini_blog->name);
 			$sidebar_args = apply_filters('cfmb_sidebar_args', $sidebar_args, $mini_blog);
-			
+
 			$this->term_sidebar_map[$mini_blog->slug] = register_sidebar($sidebar_args);
 		}
 	}
-	
+
 	/**
 	 * Loops over the active mini-blogs and creates a menu for each one
 	 *
@@ -431,8 +392,9 @@ class CF_Mini_Blog {
 		$menu_map = array();
 		$mini_blogs = $this->get_mini_blogs();
 		foreach ($mini_blogs as $mini_blog) {
+
 			$menu_name = sprintf(__('Mini-Blog: %s', 'cf_mini_blog'), $mini_blog->name);
-			
+
 			$menu_id = wp_create_nav_menu($menu_name);
 			if (is_wp_error($menu_id)) {
 				$menu = wp_get_nav_menu_object($menu_name);
@@ -442,8 +404,8 @@ class CF_Mini_Blog {
 		}
 		$this->term_menu_map = $menu_map;
 	}
-	
-	
+
+
 	/**
 	 * Loads stuff for the specific admin page
 	 *
@@ -452,20 +414,20 @@ class CF_Mini_Blog {
 	public function load_admin_page() {
 		// Bring in our list table class
 		require_once 'cf-mini-blog-list-table.class.php';
-		
+
 		// Bring in our Network Carousel Mini-Blog
 		// require_once 'carousel-plugin.php'; // @TODO this will be developed later
-		
+
 		// Handle messages
 		add_action('admin_notices', array($this, 'admin_notices'));
-		
+
 		// bring in custom JS
 		wp_enqueue_script('cfmb_admin', add_query_arg(array($this->action => 'admin_js'), admin_url()), array('jquery'), $this->ver);
-		
+
 		wp_enqueue_style('cfmb_admin', $this->url.'css/admin.css', array(), $this->ver);
 	}
-	
-	
+
+
 	/**
 	 * Output the admin JavaScript
 	 *
@@ -477,7 +439,7 @@ class CF_Mini_Blog {
 		}
 		require 'js/admin.js';
 	}
-	
+
 	/**
 	 * Handle our messages from the request handler
 	 *
@@ -490,11 +452,11 @@ class CF_Mini_Blog {
 			<div class="<?php echo esc_attr($class); ?>">
 				<p><?php echo esc_html(urldecode(stripslashes($_GET['msg']))); ?></p>
 			</div>
-			<?php 
+			<?php
 		}
 	}
-	
-	
+
+
 	/**
 	 * Registers the admin page
 	 *
@@ -509,13 +471,13 @@ class CF_Mini_Blog {
 			array($this, 'output_settings_page')
 		);
 	}
-	
-	
+
+
 	/**
 	 * Prepends a "Manage Mini-Blogs" link for our plugin on the plugins.php page
 	 *
-	 * @param array $links 
-	 * @param string $file -- filename of plugin 
+	 * @param array $links
+	 * @param string $file -- filename of plugin
 	 * @return array
 	 */
 	public function plugin_action_links($links, $file) {
@@ -525,8 +487,8 @@ class CF_Mini_Blog {
 		}
 		return $links;
 	}
-	
-	
+
+
 	/**
 	 * Outputs the HTML for the Administration page
 	 *
@@ -535,27 +497,28 @@ class CF_Mini_Blog {
 	public function output_settings_page() {
 		// add_screen_option( 'per_page', array('label' => $title, 'default' => 20) );
 		// echo screen_options();
-		
+
 		$table = new CF_Mini_blog_List_Table;
 		$table->prepare_items(); // Gather & Prep all the data for the table
-		
+
 		?>
 		<div class="wrap">
 			<?php screen_icon(); ?>
+
 			<h2><?php _e('Mini-Blog Administration', 'cf_mini_blog'); ?></h2>
 			
 			<?php
 			// Output the form to add new Mini-Blogs
 			$this->output_new_term_form();
-			
+
 			// Output the Mini-Blog Table
 			$table->display();
 			?>
 		</div>
 		<?php
 	}
-	
-	
+
+
 	/**
 	 * Outputs the small "New Mini BLog" Form
 	 *
@@ -577,34 +540,34 @@ class CF_Mini_Blog {
 		<form action="<?php echo esc_url(admin_url()); ?>" method="post">
 		
 			<?php $this->output_hidden_form_fields('add_new_term'); ?>
-			
+
 			<h3><?php _e('Add a New Mini-Blog', 'cf_mini_blog'); ?></h3>
 			<label for="cfmb_new_term"><?php _e('Name of Mini-Blog', 'cf_mini_blog'); ?></label>: <input type="text" name="cfmb_new_term" id="cfmb_new_term" value="" />
 			<button type="submit" class="button-primary"><?php _e('Create', 'cf_mini_blog'); ?></button>
 			<input type="hidden" name="paged" id="paged" value="<?php echo esc_attr($this->get_pagenum()); ?>" />
-			
+
 		</form>
 		<?php
 	}
-	
-	
+
+
 	/**
 	 * Output a nonce and our hidden request handler field
 	 *
-	 * @param string $name 
+	 * @param string $name
 	 * @return void
 	 */
 	private function output_hidden_form_fields($name) {
 		// Output a nonce field
 		echo wp_nonce_field('cfmb_'.$name, '_cfmb_'.$name);
-		
+
 		// Now our request handler field
 		?>
 		<input type="hidden" name="<?php echo $this->action; ?>" value="<?php echo esc_attr($name); ?>" />
 		<?php
 	}
-	
-	
+
+
 	/**
 	 * Adds a new taxonomy term
 	 *
@@ -617,12 +580,12 @@ class CF_Mini_Blog {
 		if (is_wp_error($r) || empty($r)) {
 			return false;
 		}
-		
+
 		// $r = array('term_id' => $term_id, 'term_taxonomy_id' => $tt_id);
 		return $r['term_id'];
 	}
-	
-	
+
+
 	/**
 	 * Get what page we're on
 	 *
@@ -631,24 +594,24 @@ class CF_Mini_Blog {
 	private function get_pagenum() {
 		return isset( $_REQUEST['paged'] ) ? absint( $_REQUEST['paged'] ) : 0;
 	}
-	
-	
+
+
 	/**
 	 * Uploads an image and returns the post_id of the attachment
 	 *
-	 * @param string $name 
-	 * @param string $type - image/jpeg 
+	 * @param string $name
+	 * @param string $type - image/jpeg
 	 * @param string $bits - bits from file_get_contents()
 	 * @return int | WP_Error - Integer of attachment post ID or WP_Error on fail
 	 */
 	private function upload_image($name, $type, $bits) {
 		$upload = wp_upload_bits($name, NULL, $bits);
-		
+
 		if ( ! empty($upload['error']) ) {
 			$errorString = sprintf(__('Could not write file %1$s (%2$s)'), $name, $upload['error']);
 			return new WP_Error($this->error_code, $errorString);
 		}
-		
+
 		// Construct the attachment array
 		$attachment = array(
 			'post_title' => $name,
@@ -658,16 +621,16 @@ class CF_Mini_Blog {
 			'post_mime_type' => $type,
 			'guid' => $upload[ 'url' ]
 		);
-		
+
 		/** WordPress Image Administration API */
 		require_once(ABSPATH . 'wp-admin/includes/image.php');
 
 		// Save the data
 		$id = wp_insert_attachment($attachment, $upload['file']);
-		
+
 		// Generates the different image sizes
 		wp_update_attachment_metadata($id, wp_generate_attachment_metadata( $id, $upload['file'] ) );
-		
+
 		return $id;
 	}
 	/**
@@ -704,10 +667,10 @@ class CF_Mini_Blog {
 					if (!check_admin_referer('cfmb_add_new_term', '_cfmb_add_new_term') && current_user_can('manage_options')) {
 						wp_die(__("You shouldn't be here", 'cf_mini_blog')); // Nope
 					}
-					
+
 					// Sanitize our input
 					$term_name = stripslashes(wp_filter_nohtml_kses($_POST['cfmb_new_term']));
-					
+
 					// Set return URL args based on results of $this->add_new_term()
 					if ($this->add_new_term($term_name)) {
 						$r = 'success';
@@ -723,10 +686,10 @@ class CF_Mini_Blog {
 							'msg' => urlencode(sprintf($this->get_success_fail_string($r, 'add_new_term'), $term_name)),
 						);
 					}
-					
+
 					// Stay on the same page
 					$args['paged'] = $this->get_pagenum();
-					
+
 					// Actually redirect
 					wp_redirect(add_query_arg($args, $this->menu_page_url));
 					exit;
@@ -736,23 +699,23 @@ class CF_Mini_Blog {
 					if (!check_admin_referer('edit_mb', '_edit_mb') && current_user_can('manage_options')) {
 						wp_die(__("You shouldn't be here", 'cf_mini_blog')); // Nope
 					}
-					
+
 					$id = absint($_POST['id']);
-					$mini_blog = get_term($id, $this->taxonomy); 
-					
+					$mini_blog = get_term($id, $this->taxonomy);
+
 					// Default thumbnail
 					$thumbnail = !empty($_POST['image-'.$id]) ? (int) $_POST['image-'.$id] : 0;
 					if (is_array($_FILES) && isset($_FILES['image-'.$id]) && !empty($_FILES['image-'.$id]['tmp_name'])) {
 						$image_upload = $_FILES['image-'.$id];
-						
+
 						// Prep vars for upload_image method
 						$name = sanitize_file_name($image_upload['name']);
 						$type = $image_upload['type'];
 						$bits = file_get_contents($image_upload['tmp_name']);
-						
+
 						// Create the attachment post
 						$upload_id = $this->upload_image($name, $type, $bits);
-						
+
 						if (is_wp_error($upload_id)) {
 							$args = array(
 								'r' => 'fail',
@@ -762,27 +725,29 @@ class CF_Mini_Blog {
 							wp_redirect(add_query_arg($args, $this->menu_page_url));
 							die();
 						}
-						
+
 						// Assign the attachment ID as postmeta
 						$thumbnail = $upload_id;
 					}
-					
+
 					// @TODO need to allow javascript, but not HTML?
 					$leaderboard_code = stripslashes($_POST['leaderboard_code-'.$id]);
 					$analytics_code = stripslashes($_POST['analytics_code-'.$id]);
+					$mobile_ad_code = stripslashes($_POST['mobile_ad_code-'.$id]);
 					$exclude_on_home = empty($_POST['exclude_on_home-'.$id]) ? 0 : 1;
 					$dark_theme = empty($_POST['dark_theme-'.$id]) ? 0 : 1;
 					$image_only_excerpts = empty($_POST['image_only_excerpts-'.$id]) ? 0 : 1;
-					
+
 					$result = $this->save_mini_blog_meta($id, compact(
-						'leaderboard_code', 
-						'analytics_code', 
-						'thumbnail', 
+						'leaderboard_code',
+						'mobile_ad_code',
+						'analytics_code',
+						'thumbnail',
 						'exclude_on_home',
 						'dark_theme',
 						'image_only_excerpts'
 					));
-					
+
 					if (!is_wp_error($result)) {
 						$args = array(
 							'success' => 1,
@@ -797,26 +762,26 @@ class CF_Mini_Blog {
 							'id' => $mini_blog->term_id,
 						);
 					}
-					
-					
+
+
 					if (!empty($_POST['doingAjax'])) {
 						echo json_encode($args);
 					}
 					else {
 						// Stay on the same page
 						$args['paged'] = $this->get_pagenum();
-						
+
 						// Change args for URL instead of ajax
 						$args['r'] = ($args['success']) ? 'success' : 'fail';
 						unset($args['success']);
-						
+
 						// URL encode message
 						$args['msg'] = urlencode($args['msg']);
-						
+
 						// Actually redirect
 						wp_redirect(add_query_arg($args, $this->menu_page_url));
 					}
-					
+
 					exit;
 					break;
 				default:
@@ -830,12 +795,12 @@ class CF_Mini_Blog {
 					if (!check_admin_referer('delete_thumb') && current_user_can('manage_options')) {
 						wp_die(__("You shouldn't be here", 'cf_mini_blog')); // Nope
 					}
-					
+
 					$mini_blog_id = (int) $_GET['id'];
-					
+
 					// Keep our term name around for the message
 					$term_name = get_term_field('name', $mini_blog_id, $this->taxonomy);
-					
+
 					if ($this->delete_mini_blog_meta($mini_blog_id, 'thumbnail')) {
 						$r = 'success';
 						$args = array(
@@ -853,7 +818,7 @@ class CF_Mini_Blog {
 					// Stay on the same page we were on
 					$args['paged'] 	= $this->get_pagenum();
 					$args['id'] 	= $mini_blog_id;
-					
+
 					// Actually redirect
 					wp_redirect(add_query_arg($args, $this->menu_page_url));
 					exit;
@@ -865,23 +830,23 @@ class CF_Mini_Blog {
 					if (!check_admin_referer('mini_blog_action') && current_user_can('manage_options')) {
 						wp_die(__("You shouldn't be here", 'cf_mini_blog')); // Nope
 					}
-					
+
 					// Sanitize what we're accepting
 					$term_id = (int) $_GET['id'];
 					$action = strip_tags(stripslashes($_GET[$this->action]));
 					$func_name = $action.'_mini_blog';
-					
-					
+
+
 					// Simple sanitize
 					if (!method_exists($this, $func_name)) {
 						wp_die(sprintf(__("Called a bad method: %s", 'cf_mini_blog'), 
 							'CF_Mini_Blog::'.$func_name
 						));
 					}
-					
+
 					// Keep our term name around for the message
 					$term_name = get_term_field('name', $term_id, $this->taxonomy);
-					
+
 					// Perform the actual action
 					if ($this->$func_name($term_id)) {
 						$r = 'success';
@@ -897,10 +862,10 @@ class CF_Mini_Blog {
 							'msg' => urlencode(sprintf($this->get_success_fail_string($r, $action), $term_name)),
 						);
 					}
-					
+
 					// Stay on the same page we were on
 					$args['paged'] = $this->get_pagenum();
-					
+
 					// Actually redirect
 					wp_redirect(add_query_arg($args, $this->menu_page_url));
 					exit;
@@ -910,31 +875,31 @@ class CF_Mini_Blog {
 			}
 		}
 	}
-	
-	
+
+
 	/**
 	 * Deletes a Mini-Blog's meta
 	 *
-	 * @param int $mini_blog_term_id 
-	 * @param string $meta_field 
+	 * @param int $mini_blog_term_id
+	 * @param string $meta_field
 	 * @return bool
 	 */
 	public function delete_mini_blog_meta($mini_blog_term_id, $meta_field) {
 		// Look up our Mini-Blog post-type so we can get the post meta
 		$mini_blog = $this->get_mini_blog_post_type($mini_blog_term_id);
-		if (!$mini_blog) { 
+		if (!$mini_blog) {
 			return false;
 		}
 		delete_post_meta($mini_blog->ID, $meta_field);
 		return true;
 	}
-	
-	
+
+
 	/**
 	 * Gets the meta value for a Mini-Blog
 	 *
-	 * @param int $mini_blog_term_id 
-	 * @param string $meta_field 
+	 * @param int $mini_blog_term_id
+	 * @param string $meta_field
 	 * @return mixed
 	 */
 	public function get_mini_blog_meta($mini_blog_term_id, $meta_field) {
@@ -943,15 +908,15 @@ class CF_Mini_Blog {
 		}
 		// Look up our Mini-Blog post-type so we can get the post meta
 		$mini_blog = $this->get_mini_blog_post_type($mini_blog_term_id);
-		if (!$mini_blog) { 
+		if (!$mini_blog) {
 			return false;
 		}
 		return get_post_meta($mini_blog->ID, $meta_field, true);
 	}
-	
+
 	public function get_mini_blogs_by_meta($meta_key, $meta_value) {
 		$term_array = array();
-		
+
 		$args = array(
 			'post_type' => $this->post_type,
 			'meta_query' => array(
@@ -968,14 +933,14 @@ class CF_Mini_Blog {
 			$mini_blog_id = str_replace('mini-blog-id-', '', $post->post_name);
 			$term_array[] = (int) $mini_blog_id;
 		}
-		
+
 		return $term_array;
 	}
-	
+
 	/**
 	 * Saves an array of meta to a Mini-Blog post type
 	 *
-	 * @param int $mini_blog_term_id 
+	 * @param int $mini_blog_term_id
 	 * @param array $meta - (meta_key => meta_value)
 	 * @return bool | WP_Error
 	 */
@@ -983,12 +948,13 @@ class CF_Mini_Blog {
 		$default_meta = array(
 			'leaderboard_code' => '',
 			'analytics_code' => '',
+			'mobile_ad_code' => '',
 		);
 		$meta = array_merge($default_meta, $meta);
-		
+
 		// Look up our Mini-Blog post-type so we can get the post meta
 		$mini_blog = $this->get_mini_blog_post_type($mini_blog_term_id);
-		
+
 		// If we couldn't find an associated Mini-Blog, create one
 		if (!$mini_blog) {
 			$mini_blog = $this->create_mini_blog_post_type($mini_blog_term_id);
@@ -996,29 +962,29 @@ class CF_Mini_Blog {
 				return $mini_blog;
 			}
 		}
-		
+
 		// Finally save the meta to the Mini-Blog post object
 		foreach ($meta as $key => $val) {
 			update_post_meta($mini_blog->ID, $key, $val);
 		}
-		
+
 		// Let callers know we're good
 		return true;
 	}
-	
-	
+
+
 	/**
-	 * Returns the Mini-Blog custom post type object related to 
+	 * Returns the Mini-Blog custom post type object related to
 	 * the Mini-Blog taxonomy term ID
 	 *
-	 * @param int $id 
+	 * @param int $id
 	 * @return bool | obj - False on failure, Post object on success
 	 */
 	private function get_mini_blog_post_type($id) {
 		if (!$id) {
 			return false;
 		}
-		
+
 		$args = array(
 			'post_type' => $this->post_type,
 			'tax_query' => array(
@@ -1033,8 +999,8 @@ class CF_Mini_Blog {
 		$post = empty($posts) ? false : array_shift($posts);
 		return $post;
 	}
-	
-	
+
+
 	/**
 	 * Creates the post type object for a Mini-Blog.  This houses the meta for the Mini-Blog
 	 * such as ad/analytics codes, featured image, etc.
@@ -1053,7 +1019,7 @@ class CF_Mini_Blog {
 			'post_title' => 'Mini-Blog ID: '.$id,
 		);
 		$post_id = wp_insert_post($args, true);
-		
+
 		if (is_wp_error($post_id)) {
 			return new WP_Error($this->error_code, $post_id->get_error_message());
 		}
@@ -1062,13 +1028,13 @@ class CF_Mini_Blog {
 		}
 		return get_post($post_id);
 	}
-	
-	
+
+
 	/**
 	 * One place for translatable success/fail messages
 	 *
 	 * @param string $success_or_fail - Either 'success' or 'fail'
-	 * @param string $action 
+	 * @param string $action
 	 * @return string - Translated and filtered message string
 	 */
 	private function get_success_fail_string($success_or_fail, $action) {
@@ -1112,22 +1078,22 @@ class CF_Mini_Blog {
 		}
 		return apply_filters('cfmb_success_fail_string', $msg, compact('success_or_fail', 'action'));
 	}
-	
+
 	/**
 	 * Gets the plugin's option, and then the setting inside the option
 	 *
-	 * @param string $setting 
-	 * @return mixed array|string 
+	 * @param string $setting
+	 * @return mixed array|string
 	 */
 	public function get_setting($setting) {
 		$option = get_option($this->option_name, $this->defaults);
 		return $option[$setting];
 	}
-	
+
 	/**
 	 * Sets the plugin's option with an array key of the setting
 	 *
-	 * @param string $setting 
+	 * @param string $setting
 	 * @param mixed $value - Whatever it needs to be array or string, etc.
 	 * @return void
 	 */
@@ -1136,18 +1102,18 @@ class CF_Mini_Blog {
 		$option[$setting] = $value;
 		return update_option($this->option_name, $option);
 	}
-	
-	
+
+
 	/**
-	 * Returns all the active Mini-Blog IDs 
+	 * Returns all the active Mini-Blog IDs
 	 *
 	 * @return array
 	 */
 	public function get_active_mini_blogs() {
 		return (array) $this->get_setting('active_mini_blogs');
 	}
-	
-	
+
+
 	/**
 	 * Returns all the inactive Mini-Blog IDs
 	 *
@@ -1158,83 +1124,83 @@ class CF_Mini_Blog {
 		$actives = $this->get_active_mini_blogs();
 		return array_diff($all, $actives);
 	}
-	
-	
+
+
 	/**
 	 * Delete a Mini-Blog by ID
 	 *
-	 * @param int $term_id 
+	 * @param int $term_id
 	 * @return bool
 	 */
 	private function delete_mini_blog($mini_blog_id) {
 		$term = get_term($mini_blog_id, $this->taxonomy);
-		
+
 		// Remove it from the active blogs
 		$this->deactivate_mini_blog($mini_blog_id);
-		
+
 		// Delete the Nav Menu
 		wp_delete_nav_menu(sprintf(__('Mini-Blog: %s', 'cf_mini_blog'), $term->name));
 
 		// Finally delete the Mini-Blog Term
 		$r = wp_delete_term($mini_blog_id, $this->taxonomy);
-		
+
 		// Make sure it got removed successfully
 		if (is_wp_error($r) || empty($r)) {
 			return false;
 		}
-		
+
 		return true;
 	}
-	
-	
+
+
 	/**
 	 * Activate Mini-Blog by ID
 	 *
-	 * @param int $mini_blog_id 
+	 * @param int $mini_blog_id
 	 * @return bool
 	 */
 	public function activate_mini_blog($mini_blog_id) {
 		$actives = $this->get_active_mini_blogs();
-		
+
 		// If we're not in the active mini-blogs, add this
 		if (!in_array($mini_blog_id, $actives)) {
 			$actives[] = intval($mini_blog_id);
 		}
-		
+
 		return $this->set_setting('active_mini_blogs', $actives);
 	}
-	
-	
+
+
 	/**
 	 * Deactivate Mini-Blog by ID
 	 *
-	 * @param int $mini_blog_id 
+	 * @param int $mini_blog_id
 	 * @return bool
 	 */
 	private function deactivate_mini_blog($mini_blog_id) {
 		$actives = $this->get_active_mini_blogs();
-		
+
 		// Seek and destroy
 		$key = array_search(intval($mini_blog_id), $actives);
 		if ($key !== false) {
 			unset($actives[$key]);
 		}
-		
+
 		return $this->set_setting('active_mini_blogs', $actives);
 	}
-	
-	
+
+
 	/**
 	 * Is the passed Mini-Blog active
-	 *  
+	 *
 	 * @param obj $mini_blog - Taxonomy Term
 	 * @return bool
 	 */
 	public function is_mini_blog_active($mini_blog) {
 		return in_array(intval($mini_blog->term_id), $this->get_active_mini_blogs());
 	}
-	
-	
+
+
 	/**
 	 * Returns various action links based on the Mini-Blog Term passed
 	 *
@@ -1245,7 +1211,7 @@ class CF_Mini_Blog {
 		$actions = array(
 			'edit' => __('Edit', 'cf_mini_blog'),
 		);
-		
+
 		// Conditionally add the (de)activate actions
 		if ($this->is_mini_blog_active($mini_blog)) {
 			$actions['deactivate'] = __('Deactivate', 'cf_mini_blog');
@@ -1253,7 +1219,7 @@ class CF_Mini_Blog {
 		else {
 			$actions['activate'] = __('Activate', 'cf_mini_blog');
 		}
-		
+
 		// Add the delete action to the end of the $actions
 		$actions['delete'] = __('Delete', 'cf_mini_blog');
 		
@@ -1268,7 +1234,7 @@ class CF_Mini_Blog {
 					);
 					break;
 				default:
-					$links[] = sprintf('<a href="%s" title="%s">%s</a>', 
+					$links[] = sprintf('<a href="%s" title="%s">%s</a>',
 						wp_nonce_url(add_query_arg(array($this->action => $action, 'id' => $mini_blog->term_id), admin_url()), 'mini_blog_action'),
 						esc_attr($text),
 						esc_html($text)
@@ -1278,13 +1244,13 @@ class CF_Mini_Blog {
 		}
 		return implode(' | ', $links);
 	}
-	
-	
+
+
 	/**
 	 * Populate the URLs for the various columns (sidebar, menu, etc.)
 	 *
-	 * @param string $column_name 
-	 * @param string $item 
+	 * @param string $column_name
+	 * @param string $item
 	 * @return void
 	 */
 	function get_manage_url($column_name, $item) {
@@ -1301,9 +1267,9 @@ class CF_Mini_Blog {
 		}
 		return $url;
 	}
-	
+
 	/**
-	 * Modify the home page posts, to exclude any of our active Mini-Blogs that 
+	 * Modify the home page posts, to exclude any of our active Mini-Blogs that
 	 * selected to have their posts removed from the home page loop
 	 *
 	 * @param obj $wp_query - Current WP_Query
@@ -1320,13 +1286,13 @@ class CF_Mini_Blog {
 					$excludes[] = $mb_term_id;
 				}
 			}
-			
+
 			// If we have excludes, then change the wp_query
 			if (!empty($excludes)) {
 				// Get any current tax queries
 				$current_tax_queries = $wp_query->get('tax_query');
 				$current_tax_queries = empty($current_tax_queries) ? array() : $current_tax_queries;
-				
+
 				// Add in our excludes
 				$current_tax_queries[] = array(
 					'taxonomy' => $this->taxonomy,
