@@ -247,6 +247,10 @@ class CFMB_Template_Helper {
 		return $this->get_related_meta('leaderboard_code');
 	}
 
+	public function get_mobile_ad_code() {
+		return $this->get_related_meta('mobile_ad_code');
+	}
+
 	public function get_analytics_code() {
 		return $this->get_related_meta('analytics_code');
 	}
