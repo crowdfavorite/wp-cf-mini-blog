@@ -9,7 +9,7 @@ class CFMB_Template_Helper {
 			$ins = CF_Mini_Blog::factory();
 		}
 		$this->ins = $ins;
-		
+
 		if (!$queried_object) {
 			$queried_object = get_queried_object();
 		}
@@ -17,7 +17,7 @@ class CFMB_Template_Helper {
 		$this->term_sidebar_map = $this->ins->term_sidebar_map;
 		$this->term_menu_map = $this->ins->term_menu_map;
 	}
-	
+
 	/**
 	 * Pass in post or term.
 	 * Will tell you if the queried object is a post or term.
@@ -25,7 +25,7 @@ class CFMB_Template_Helper {
 	 */
 	public function queried_object_quacks_like($type) {
 		$is_a_duck = false;
-		
+
 		if ($this->queried_object) {
 			switch ($type) {
 				case 'post':
@@ -36,13 +36,13 @@ class CFMB_Template_Helper {
 					break;
 			}
 		}
-		
+
 		return $is_a_duck;
 	}
-	
+
 	public function get_related_terms($only_active_terms = true) {
 		$related_terms = array();
-		
+
 		// If it's a post
 		if ($this->queried_object_quacks_like('post')) {
 			$terms = get_the_terms($this->queried_object->ID, $this->ins->taxonomy);
@@ -84,25 +84,25 @@ class CFMB_Template_Helper {
 		) {
 			$related_terms = array($this->queried_object);
 		}
-		
+
 		// Make sure the terms that are related are also active
 		if ($only_active_terms && count($related_terms)) {
 			$tmp = array();
 			foreach ($related_terms as $term) {
 				if ($this->ins->is_mini_blog_active($term)) {
-					$tmp[] = $term; 
+					$tmp[] = $term;
 				}
 			}
 			$related_terms = $tmp;
 		}
 		return $related_terms;
 	}
-	
+
 	/**
 	 * Get back an array of sidebars related to the current query.
 	 * Since multiple terms can potentially belong to a query, this function
 	 * passes back an array of related sidebars.
-	 * 
+	 *
 	 * It's related if one of these things is true:
 	 * - It's a singular query and the post contains the term for the sidebar
 	 * - It's a taxonomy archive query and the taxonomy archive term matches
@@ -130,7 +130,7 @@ class CFMB_Template_Helper {
 			// Memoize
 			$this->related_sidebars = $matches;
 		}
-		
+
 		return $this->related_sidebars;
 	}
 
@@ -140,7 +140,7 @@ class CFMB_Template_Helper {
 		}
 		return $this->ins->get_mini_blogs($args);
 	}
-	
+
 	/**
 	 * Boolean formulation of get_related_sidebars().
 	 * @return bool
@@ -148,7 +148,7 @@ class CFMB_Template_Helper {
 	public function has_related_sidebar() {
 		return (bool) count($this->get_related_sidebars());
 	}
-	
+
 	/**
 	 * Choose a sidebar for the current page based on related.
 	 */
@@ -160,7 +160,7 @@ class CFMB_Template_Helper {
 		$sidebars_temp = $sidebars;
 		dynamic_sidebar(array_shift($sidebars_temp));
 	}
-	
+
 	public function get_related_menu_id() {
 		$terms = $this->get_related_terms();
 		if (!$terms) {
@@ -171,7 +171,7 @@ class CFMB_Template_Helper {
 			return $this->term_menu_map[$term->slug];
 		}
 	}
-	
+
 	public function get_attachment_image($size = 'thumbnail', $attr = '') {
 		$attachment_id = $this->get_related_meta('thumbnail');
 		if ($attachment_id) {
@@ -179,7 +179,7 @@ class CFMB_Template_Helper {
 		}
 		return '';
 	}
-	
+
 	public function get_masthead($size = '') {
 		$terms = $this->get_related_terms();
 		$term = array_shift($terms);
@@ -203,7 +203,7 @@ class CFMB_Template_Helper {
 		}
 		return '';
 	}
-	
+
 	public function mini_blog_link() {
 		$terms = $this->get_related_terms();
 		$term = array_shift($terms);
@@ -213,7 +213,7 @@ class CFMB_Template_Helper {
 		}
 		return '';
 	}
-	
+
 	public function mini_blog_feed_link_url() {
 		$terms = $this->get_related_terms();
 		$term = array_shift($terms);
@@ -227,7 +227,7 @@ class CFMB_Template_Helper {
 		}
 		return $feed_url;
 	}
-	
+
 	/**
 	 * Gets post meta related to current view
 	 */
@@ -242,11 +242,11 @@ class CFMB_Template_Helper {
 		}
 		return $out;
 	}
-	
+
 	public function get_leaderboard_code() {
 		return $this->get_related_meta('leaderboard_code');
 	}
-	
+
 	public function get_analytics_code() {
 		return $this->get_related_meta('analytics_code');
 	}
@@ -260,7 +260,7 @@ class CFMB_Template_Helper {
 		$meta = $this->get_related_meta('image_only_excerpts');
 		return $meta == "1";
 	}
-	
+
 	public function render_analytics_code() {
 		echo $this->get_analytics_code();
 	}
