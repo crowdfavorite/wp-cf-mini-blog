@@ -46,7 +46,14 @@ class CF_Mini_Blog {
 	private function __construct() {
 		/* Define what our "action" is that we'll 
 		listen for in our request handlers */
-		$this->url = plugin_dir_url(__FILE__);
+		if (file_exists(trailingslashit(get_stylesheet_directory()).'plugins/'.basename(dirname(__FILE__)))) {
+			error_log("\n\n\n\n qwoeqwhoieoqiwieoqwheqoiw");
+        	$this->url = trailingslashit(trailingslashit(get_stylesheet_directory_uri()).'plugins/'.basename(dirname(__FILE__)));
+		}
+		else {
+        	$this->url = trailingslashit(plugin_dir_url(__FILE__));
+		}
+		
 		$this->action = 'cf_mini_blog_action';
 		$this->i18n = 'cf_mini_blog';
 		$this->taxonomy = 'cf_mini_blog';
