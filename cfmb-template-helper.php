@@ -218,13 +218,4 @@ class CFMB_Template_Helper {
 	public function render_analytics_code() {
 		echo $this->get_analytics_code();
 	}
-
-	// Return slug of current mini blog, false if not set
-	public function get_current_mini_blog_slug() {
-		$terms = get_the_terms($this->queried_object->ID, $this->ins->taxonomy);
-		if (is_object($terms[0]) && isset($terms[0]->slug)) {
-			return $terms[0]->slug;
-		}
-		return false;
-	}
 }
