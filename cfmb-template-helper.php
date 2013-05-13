@@ -219,4 +219,3 @@ class CFMB_Template_Helper {
 		echo $this->get_analytics_code();
 	}
 }
-?>

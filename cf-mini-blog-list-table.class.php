@@ -220,7 +220,7 @@ class CF_Mini_blog_List_Table extends WP_List_Table {
 					<div class="cfmb-inline-edit-col-e">
 						<div class="inline-edit-col">
 							<p class="cfmb-inp-group">
-								<label for="leaderboard_code-<?php echo $item->term_id; ?>"><?php echo esc_html('Leaderboard Ad Code', $this->i18n); ?></label>
+								<label for="leaderboard_code-<?php echo $item->term_id; ?>"><?php echo apply_filters(cfmb_leaderboard_label, esc_html('Leaderboard Ad Code', $this->i18n)); ?></label>
 								<textarea name="leaderboard_code-<?php echo $item->term_id; ?>" id="leaderboard_code-<?php echo $item->term_id?>"><?php echo esc_textarea($this->controller->get_mini_blog_meta($item->term_id, 'leaderboard_code')); ?></textarea>
 							</p>
 							<p class="cfmb-inp-group">
