@@ -2,13 +2,12 @@
 class CF_Mini_blog_List_Table extends WP_List_Table {
 	function __construct() {
 		$this->controller = CF_Mini_Blog::factory();
-		$this->i18n = $this->controller->i18n;
 		
 		$this->per_page = $this->get_items_per_page('cf_mini_blog_items_per_page', 10); // number of items per table page
 		
 		$args = array(
-			'plural' 	=> __('Mini-Blogs', $this->i18n),
-			'singular' 	=> __('Mini-Blog', $this->i18n),
+			'plural' 	=> __('Mini-Blogs', 'cf_mini_blog'),
+			'singular' 	=> __('Mini-Blog', 'cf_mini_blog'),
 			'ajax'		=> true,
 		);
 
@@ -59,7 +58,7 @@ class CF_Mini_blog_List_Table extends WP_List_Table {
 			case 'menu':
 				$content = '';
 				if ($this->controller->is_mini_blog_active($item)) {
-					$manage_str = sprintf(__('%s &mdash; %s', $this->i18n), $this->get_column_name($column_name), $item->name);
+					$manage_str = sprintf(__('%s &mdash; %s', 'cf_mini_blog'), $this->get_column_name($column_name), $item->name);
 					$content = sprintf('<a href="%s" title="%s">%s</a>',
 						$this->controller->get_manage_url($column_name, $item),
 						esc_attr($manage_str),
@@ -79,11 +78,11 @@ class CF_Mini_blog_List_Table extends WP_List_Table {
 	 */
 	function get_columns() {
 		$columns = array(
-			'id' 		=> __('ID', $this->i18n),
-			'name' 		=> __('Mini-Blog', $this->i18n),
-			'actions' 	=> __('Actions', $this->i18n), // deactivate / activate / delete
-			'sidebar' 	=> __('Sidebar', $this->i18n),
-			'menu'		=> __('Menu', $this->i18n),
+			'id' 		=> __('ID', 'cf_mini_blog'),
+			'name' 		=> __('Mini-Blog', 'cf_mini_blog'),
+			'actions' 	=> __('Actions', 'cf_mini_blog'), // deactivate / activate / delete
+			'sidebar' 	=> __('Sidebar', 'cf_mini_blog'),
+			'menu'		=> __('Menu', 'cf_mini_blog'),
 		);
 		return $columns;
 	}
@@ -192,7 +191,7 @@ class CF_Mini_blog_List_Table extends WP_List_Table {
 						<div class="inline-edit-col">
 							<h4><?php echo $item->name; ?></h4>
 							<p class="cfmb-inp-group">
-								<label for="image-<?php echo $item->term_id; ?>"><?php echo esc_html('Custom Image', $this->i18n); ?></label>
+								<label for="image-<?php echo $item->term_id; ?>"><?php echo esc_html('Custom Image', 'cf_mini_blog'); ?></label>
 								<?php 
 								$thumb_id = $this->controller->get_mini_blog_meta($item->term_id, 'thumbnail');
 								if (!empty($thumb_id)) {
@@ -203,7 +202,7 @@ class CF_Mini_blog_List_Table extends WP_List_Table {
 									$delete_url = wp_nonce_url(add_query_arg($args, admin_url()), 'delete_thumb');
 									?>
 									<span class="cfmb-edit-img">
-										<img src="<?php echo esc_url(wp_get_attachment_thumb_url($thumb_id)); ?>" /> <a class="delete-link" href="<?php echo esc_url($delete_url); ?>"><?php _e('Remove Image', $this->i18n); ?></a>
+										<img src="<?php echo esc_url(wp_get_attachment_thumb_url($thumb_id)); ?>" /> <a class="delete-link" href="<?php echo esc_url($delete_url); ?>"><?php _e('Remove Image', 'cf_mini_blog'); ?></a>
 										<input type="hidden" name="image-<?php echo $item->term_id; ?>" id="image-<?php echo $item->term_id; ?>" value="<?php echo esc_attr($thumb_id); ?>" />
 									</span>
 									<?php
@@ -220,24 +219,24 @@ class CF_Mini_blog_List_Table extends WP_List_Table {
 					<div class="cfmb-inline-edit-col-e">
 						<div class="inline-edit-col">
 							<p class="cfmb-inp-group">
-								<label for="leaderboard_code-<?php echo $item->term_id; ?>"><?php echo apply_filters(cfmb_leaderboard_label, esc_html('Leaderboard Ad Code', $this->i18n)); ?></label>
+								<label for="leaderboard_code-<?php echo $item->term_id; ?>"><?php echo apply_filters(cfmb_leaderboard_label, esc_html('Leaderboard Ad Code', 'cf_mini_blog')); ?></label>
 								<textarea name="leaderboard_code-<?php echo $item->term_id; ?>" id="leaderboard_code-<?php echo $item->term_id?>"><?php echo esc_textarea($this->controller->get_mini_blog_meta($item->term_id, 'leaderboard_code')); ?></textarea>
 							</p>
 							<p class="cfmb-inp-group">
-								<label for="analytics_code-<?php echo $item->term_id; ?>"><?php echo esc_html('Analytics Code', $this->i18n); ?></label>
+								<label for="analytics_code-<?php echo $item->term_id; ?>"><?php echo esc_html('Analytics Code', 'cf_mini_blog'); ?></label>
 								<textarea name="analytics_code-<?php echo $item->term_id; ?>" id="analytics_code-<?php echo $item->term_id?>"><?php echo esc_textarea($this->controller->get_mini_blog_meta($item->term_id, 'analytics_code')); ?></textarea>
 							</p>
 							<p class="cfmb-inp-group label-inline">
 								<input type="checkbox" value="1" name="exclude_on_home-<?php echo $item->term_id; ?>" id="exclude_on_home-<?php echo $item->term_id?>"<?php checked(1, $this->controller->get_mini_blog_meta($item->term_id, 'exclude_on_home')); ?> />
-								<label for="exclude_on_home-<?php echo $item->term_id; ?>"><?php echo esc_html('Exclude posts from Home Page?', $this->i18n); ?></label>
+								<label for="exclude_on_home-<?php echo $item->term_id; ?>"><?php echo esc_html('Exclude posts from Home Page?', 'cf_mini_blog'); ?></label>
 							</p>
 						</div>
 					</div>
 					
 					<?php do_action('cfmb_row_after_details', $item, $this); ?>
 					<p class="submit inline-edit-save">
-						<button type="submit" class="button-primary alignright edit-single-mb" data-form_id="<?php echo esc_attr($form_id); ?>"><?php _e('Save', $this->i18n); ?></button>
-						<button class="button-secondary cancel-single-mb alignleft" data-form_id="<?php echo esc_attr($form_id); ?>" data-RowID="<?php echo esc_attr($item->term_id); ?>"><?php _e('Cancel', $this->i18n); ?></button>
+						<button type="submit" class="button-primary alignright edit-single-mb" data-form_id="<?php echo esc_attr($form_id); ?>"><?php _e('Save', 'cf_mini_blog'); ?></button>
+						<button class="button-secondary cancel-single-mb alignleft" data-form_id="<?php echo esc_attr($form_id); ?>" data-RowID="<?php echo esc_attr($item->term_id); ?>"><?php _e('Cancel', 'cf_mini_blog'); ?></button>
 						<br class="clear" />
 					</p>
 				</form>
