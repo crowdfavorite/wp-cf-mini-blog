@@ -47,6 +47,26 @@ class CFMB_Template_Helper {
 		if ($this->queried_object_quacks_like('post')) {
 			$terms = get_the_terms($this->queried_object->ID, $this->ins->taxonomy);
 			if ($terms && !is_wp_error($terms)) {
+				
+				// Make sure that the primary term is added to the first item of the array.
+				// All helper functions assume this to be the 'only' mini blog
+				if ($this->ins->get_setting('select_multiple')) {
+					$primary_found = false;
+					$primary_term = get_post_meta($this->queried_object->ID, $this->ins->primary_meta_key, true);
+					foreach ($terms as $term_key => $term) {
+						if ($primary_term == $term->term_id) {
+							unset($terms[$term_key]);
+							array_unshift($terms, $term);
+							$primary_found = true;
+							break;
+						}
+					}
+
+					if (!$primary_found || in_array($primary_term, $this->ins->get_inactive_mini_blogs())) {
+						$terms = array();
+					}
+				}
+
 				/* Double-check to see if the terms gotten are indeed from the
 				correct taxonomy. WordPress will send back all terms if
 				there are no terms, due to some weird SQL thing */

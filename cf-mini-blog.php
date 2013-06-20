@@ -53,6 +53,7 @@ class CF_Mini_Blog {
         		$this->url = trailingslashit(plugin_dir_url(__FILE__));
 		}
 		
+		$this->primary_meta_key = '_cfmb_primary_mb';
 		$this->action = 'cf_mini_blog_action';
 		$this->taxonomy = 'cf_mini_blog';
 		$this->post_type = 'cf_mini_blog_post';
@@ -196,8 +197,26 @@ class CF_Mini_Blog {
 		$inactive = $this->get_inactive_mini_blogs();
 		
 		if ($this->get_setting('select_multiple')) {
+			$primary = get_post_meta($post->ID, $this->primary_meta_key, true);
 ?>
 	<p><?php _e('Select Mini-Blogs to associate to this post.', 'cf_mini_blog'); ?></p>
+	<div class="categorydiv">
+		<label for="cfmb-primary"> 
+			<?php _e('Primary Mini Blog ', 'cf_mini_blog');	 ?>
+			<select id="cfmb-primary" name="cfmb_mini_blog_primary" >
+				<option value="0"><?php _e('None', 'cf_mini_blog'); ?>
+				<?php 
+					foreach ($terms as $term) {
+						if (!in_array($term->term_id, $inactive)) {
+							echo '<option value="'.esc_attr($term->term_id).'"'.selected($term->term_id, $primary, false).'>'.esc_html($term->name).'</option>';
+						}
+					}
+
+				 ?>
+			</select>
+		</label>
+	</div>
+	<p></p>
 	<div id="<?php echo esc_attr('taxonomy-'.$this->taxonomy) ?>" class="<?php echo esc_attr($this->taxonomy.'div categorydiv'); ?>">
 		<div id="category-all" class="tabs-panel">
 			<input type="hidden" name="<?php echo $name; ?>" value="0">
@@ -253,6 +272,12 @@ class CF_Mini_Blog {
 			$mb_id = intval($_POST['cfmb_mini_blog_dropdown']);
 			// Assign the term
 			wp_set_post_terms($post_id, array($mb_id), $this->taxonomy);
+		}
+		else if ($post->post_type == 'post' && isset($_POST['cfmb_mini_blog_primary'])) { 
+			$mb_id = intval($_POST['cfmb_mini_blog_primary']);
+			// Assign the term
+			wp_set_post_terms($post_id, array($mb_id), $this->taxonomy, true);
+			update_post_meta($post_id, $this->primary_meta_key, $mb_id);
 		}
 	}
 	
@@ -1035,11 +1060,10 @@ class CF_Mini_Blog {
 	 * @param string $setting 
 	 * @return mixed array|string 
 	 */
-	private function get_setting($setting) {
+	public function get_setting($setting) {
 		$option = get_option($this->option_name, $this->defaults);
 		return $option[$setting];
 	}
-	
 	
 	/**
 	 * Sets the plugin's option with an array key of the setting
@@ -1070,7 +1094,7 @@ class CF_Mini_Blog {
 	 *
 	 * @return array
 	 */
-	private function get_inactive_mini_blogs() {
+	public function get_inactive_mini_blogs() {
 		$all = $this->get_mini_blog_ids();
 		$actives = $this->get_active_mini_blogs();
 		return array_diff($all, $actives);
