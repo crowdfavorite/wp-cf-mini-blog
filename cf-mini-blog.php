@@ -102,8 +102,7 @@ class CF_Mini_Blog {
 			add_action('admin_menu', array($this, 'register_settings_page'));
 			add_filter('plugin_action_links', array($this, 'plugin_action_links'), null, 2);
 			add_action('load-settings_page_'.$this->menu_page_slug, array($this, 'load_admin_page'));
-			add_action('add_meta_boxes_post', array($this, 'add_meta_box'), null, 1);
-			add_action('add_meta_boxes_page', array($this, 'add_meta_box_page'), null, 1);
+			add_action('add_meta_boxes', array($this, 'add_meta_box'), null, 1);
 			add_action('save_post', array($this, 'save_mini_blog_assignment'), null, 2);
 		}
 	}
@@ -140,8 +139,7 @@ class CF_Mini_Blog {
 				'slug' => $this->taxonomy_slug
 			)
 		);
-		$types = array('post');
-		$types = apply_filters('cfmb_register_taxonomy_types', $types);
+		$types = apply_filters('cfmb_register_taxonomy_types', array('post'));
 		$args = apply_filters('cfmb_register_taxonomy_args', $args);
 		register_taxonomy($this->taxonomy, $types, $args);
 	}
@@ -179,19 +177,12 @@ class CF_Mini_Blog {
 	 * @return void
 	 */
 	public function add_meta_box($post) {
-		add_meta_box('cfmb_mini_blogs', __('Mini-Blogs', 'cf_mini_blog'), array($this, 'output_mini_blogs_meta_box'), 'post', 'side');
+		$types = apply_filters('cfmb_register_taxonomy_types', array('post'));
+		foreach ($types as $type) {
+			add_meta_box('cfmb_mini_blogs', __('Mini-Blogs', 'cf_mini_blog'), array($this, 'output_mini_blogs_meta_box'), $type, 'side');
+		}
+		
 	}
-
-	/**
-	 * Register the Mini-Blogs meta box for the post-edit screen
-	 *
-	 * @param obj $post
-	 * @return void
-	 */
-	public function add_meta_box_page($page) {
-		add_meta_box('cfmb_mini_blogs', __('Mini-Blogs', $this->i18n), array($this, 'output_mini_blogs_meta_box'), 'page', 'side');
-	}
-
 
 	/**
 	 * Populate a metabox that allows the author to choose which Mini-Blogs
@@ -283,7 +274,8 @@ class CF_Mini_Blog {
 	 * @return void
 	 */
 	public function save_mini_blog_assignment($post_id, $post) {
-		if ($post->post_type == 'post' || $post->post_type == 'page' && isset($_POST['cfmb_mini_blog_dropdown'])) {
+		$types = apply_filters('cfmb_register_taxonomy_types', array('post'));
+		if (in_array($post->post_type, $types) && isset($_POST['cfmb_mini_blog_dropdown'])) {
 			// sanitize the $_POST[]
 			$mb_id = intval($_POST['cfmb_mini_blog_dropdown']);
 			// Assign the term
