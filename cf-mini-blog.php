@@ -283,13 +283,13 @@ class CF_Mini_Blog {
 
 		// NG Specific, only admins can assign multiple mini blogs, so we need to store them in meta as well
 		// so a normal user doesnt change them by swapping the primary mini blog
-		if (current_user_can('administrator') && isset($_POST['cfmb_doing_multi_save'])) {
+		if (in_array($post->post_type, $types) && current_user_can('administrator') && isset($_POST['cfmb_doing_multi_save'])) {
 			$ids = isset($_POST['mb_ids']) ? $_POST['mb_ids'] : array();
 			update_post_meta($post_id, '_cfmb_multi_selected', $ids);
 			wp_set_post_terms($post_id, $ids, $this->taxonomy);
 			
 		}
-		else {
+		else if (in_array($post->post_type, $types) && isset($_POST['cfmb_mini_blog_primary']){
 			$mb_ids = (array) get_post_meta($post_id, '_cfmb_multi_selected', true);
 			wp_set_post_terms($post_id, $mb_ids, $this->taxonomy);
 		}
