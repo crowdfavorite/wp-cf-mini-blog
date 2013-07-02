@@ -129,7 +129,7 @@ class CF_Mini_Blog {
 		$args = array(
 			'public' => true,
 			// We create our own custom UI
-			'show_ui' => false,
+			'show_ui' => true,
 			'labels' => array(
 				'name' => __('Mini-Blogs', 'cf_mini_blog'),
 				'singular_name' => __('Mini-Blog', 'cf_mini_blog'),
@@ -196,8 +196,8 @@ class CF_Mini_Blog {
 		$id = is_object($post) && isset($post->ID) ? $post->ID : null;
 		// Get the selected Mini-Blog
 
-		$selected = wp_get_post_terms($id, $this->taxonomy, array('fields' => 'ids'));
-		$name = esc_attr('tax_input['.$this->taxonomy.'][]');
+		$multi_selected = (array) get_post_meta($post->ID, '_cfmb_multi_selected', true);
+		$name = 'mb_ids[]';
 		$terms = get_terms($this->taxonomy, array(
 			'hide_empty' => false,
 		));
@@ -209,7 +209,7 @@ class CF_Mini_Blog {
 	<p><?php _e('Select Mini-Blogs to associate to this post.', 'cf_mini_blog'); ?></p>
 	<div class="categorydiv">
 		<label for="cfmb-primary"> 
-			<?php _e('Primary Mini Blog ', 'cf_mini_blog');	 ?>
+			<?php _e('Primary Mini Blog :', 'cf_mini_blog');	 ?>
 			<select id="cfmb-primary" name="cfmb_mini_blog_primary" >
 				<option value="0"><?php _e('None', 'cf_mini_blog'); ?>
 				<?php 
@@ -223,17 +223,21 @@ class CF_Mini_Blog {
 			</select>
 		</label>
 	</div>
+	<?php // NG Specific, only admins can assign multiple mini blogs ?>
+	<?php if (current_user_can('administrator')) : ?>
 	<p></p>
+	<p><?php _e('Additional Mini Blogs', 'cf_mini_blog');	 ?></p>
+
 	<div id="<?php echo esc_attr('taxonomy-'.$this->taxonomy) ?>" class="<?php echo esc_attr($this->taxonomy.'div categorydiv'); ?>">
 		<div id="category-all" class="tabs-panel">
-			<input type="hidden" name="<?php echo $name; ?>" value="0">
+			<input type="hidden" name="cfmb_doing_multi_save" value="1" />
 			<ul id="<?php echo esc_attr($this->taxonomy.'checklist'); ?>" data-wp-lists="<?php echo esc_attr('list:'.$this->taxonomy); ?>" class="categorychecklist form-no-clear">	
 				<?php 
 					foreach ($terms as $term) {
 						if (!in_array($term->term_id, $inactive)) {
 							echo '<li id="'.esc_attr($this->taxonomy.'-'.$term->term_id).'">
 									<label class="selectit">
-										<input value="'.esc_attr($term->term_id).'" type="checkbox" name="'.$name.'" id="'.esc_attr('in-'.$this->taxonomy.'-'.$term->term_id).'"'.checked(true, in_array($term->term_id, $selected), false).'> '.esc_html($term->name).
+										<input value="'.esc_attr($term->term_id).'" type="checkbox" name="'.$name.'" id="'.esc_attr('in-'.$this->taxonomy.'-'.$term->term_id).'"'.checked(true, in_array($term->term_id, $multi_selected), false).'> '.esc_html($term->name).
 									'</label>
 								</li>';
 						}
@@ -242,6 +246,7 @@ class CF_Mini_Blog {
 			</ul>
 		</div>
 	</div>
+	<?php endif; ?>
 <?php 
 		} 
 		else {
@@ -275,18 +280,34 @@ class CF_Mini_Blog {
 	 */
 	public function save_mini_blog_assignment($post_id, $post) {
 		$types = apply_filters('cfmb_register_taxonomy_types', array('post'));
+
+		// NG Specific, only admins can assign multiple mini blogs, so we need to store them in meta as well
+		// so a normal user doesnt change them by swapping the primary mini blog
+		if (current_user_can('administrator') && isset($_POST['cfmb_doing_multi_save'])) {
+			$ids = isset($_POST['mb_ids']) ? $_POST['mb_ids'] : array();
+			update_post_meta($post_id, '_cfmb_multi_selected', $ids);
+			wp_set_post_terms($post_id, $ids, $this->taxonomy);
+			
+		}
+		else {
+			$mb_ids = (array) get_post_meta($post_id, '_cfmb_multi_selected', true);
+			wp_set_post_terms($post_id, $mb_ids, $this->taxonomy);
+		}
+
 		if (in_array($post->post_type, $types) && isset($_POST['cfmb_mini_blog_dropdown'])) {
 			// sanitize the $_POST[]
 			$mb_id = intval($_POST['cfmb_mini_blog_dropdown']);
 			// Assign the term
 			wp_set_post_terms($post_id, array($mb_id), $this->taxonomy);
 		}
-		else if ($post->post_type == 'post' && isset($_POST['cfmb_mini_blog_primary'])) { 
+		else if (in_array($post->post_type, $types) && isset($_POST['cfmb_mini_blog_primary'])) { 
 			$mb_id = intval($_POST['cfmb_mini_blog_primary']);
 			// Assign the term
 			wp_set_post_terms($post_id, array($mb_id), $this->taxonomy, true);
 			update_post_meta($post_id, $this->primary_meta_key, $mb_id);
 		}
+
+
 	}
 
 	/**
