@@ -129,7 +129,7 @@ class CF_Mini_Blog {
 		$args = array(
 			'public' => true,
 			// We create our own custom UI
-			'show_ui' => true,
+			'show_ui' => false,
 			'labels' => array(
 				'name' => __('Mini-Blogs', 'cf_mini_blog'),
 				'singular_name' => __('Mini-Blog', 'cf_mini_blog'),
