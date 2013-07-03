@@ -289,7 +289,7 @@ class CF_Mini_Blog {
 			wp_set_post_terms($post_id, $ids, $this->taxonomy);
 			
 		}
-		else if (in_array($post->post_type, $types) && isset($_POST['cfmb_mini_blog_primary']){
+		else if (in_array($post->post_type, $types) && isset($_POST['cfmb_mini_blog_primary'])){
 			$mb_ids = (array) get_post_meta($post_id, '_cfmb_multi_selected', true);
 			wp_set_post_terms($post_id, $mb_ids, $this->taxonomy);
 		}
