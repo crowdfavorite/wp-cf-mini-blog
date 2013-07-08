@@ -207,7 +207,7 @@ class CF_Mini_Blog {
 			$primary = get_post_meta($post->ID, $this->primary_meta_key, true);
 ?>
 	<p><?php _e('Select Mini-Blogs to associate to this post.', 'cf_mini_blog'); ?></p>
-	<div class="categorydiv">
+	<div>
 		<label for="cfmb-primary"> 
 			<?php _e('Primary Mini Blog :', 'cf_mini_blog');	 ?>
 			<select id="cfmb-primary" name="cfmb_mini_blog_primary" >
