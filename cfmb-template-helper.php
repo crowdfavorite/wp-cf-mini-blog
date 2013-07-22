@@ -61,8 +61,8 @@ class CFMB_Template_Helper {
 							break;
 						}
 					}
-
-					if (!$primary_found || in_array($primary_term, $this->ins->get_inactive_mini_blogs())) {
+					
+					if (in_array($primary_term, $this->ins->get_inactive_mini_blogs())) {
 						$terms = array();
 					}
 				}

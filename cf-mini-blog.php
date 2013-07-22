@@ -196,7 +196,9 @@ class CF_Mini_Blog {
 		$id = is_object($post) && isset($post->ID) ? $post->ID : null;
 		// Get the selected Mini-Blog
 
+		$selected = wp_get_post_terms($id, $this->taxonomy, array('fields' => 'ids'));
 		$multi_selected = (array) get_post_meta($post->ID, '_cfmb_multi_selected', true);
+		
 		$name = 'mb_ids[]';
 		$terms = get_terms($this->taxonomy, array(
 			'hide_empty' => false,
@@ -205,6 +207,10 @@ class CF_Mini_Blog {
 		
 		if ($this->get_setting('select_multiple')) {
 			$primary = get_post_meta($post->ID, $this->primary_meta_key, true);
+			if (empty($primary)) {
+				$primary = is_array($selected) ? array_shift($selected) : 0;
+			}
+
 ?>
 	<p><?php _e('Select Mini-Blogs to associate to this post.', 'cf_mini_blog'); ?></p>
 	<div>
