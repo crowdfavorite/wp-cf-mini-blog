@@ -54,6 +54,7 @@ class CFMB_Template_Helper {
 					$primary_found = false;
 					$primary_term = get_post_meta($this->queried_object->ID, $this->ins->primary_meta_key, true);
 					foreach ($terms as $term_key => $term) {
+						// Add the primary miniblog to the front
 						if ($primary_term == $term->term_id) {
 							unset($terms[$term_key]);
 							array_unshift($terms, $term);
@@ -63,6 +64,8 @@ class CFMB_Template_Helper {
 					}
 					
 					if (in_array($primary_term, $this->ins->get_inactive_mini_blogs())) {
+						// This is primarily used for display purposes, so setting it empty
+						// means display none
 						$terms = array();
 					}
 				}
