@@ -3,6 +3,38 @@ class CF_Mini_blog_List_Table extends WP_List_Table {
 	function __construct() {
 		$this->controller = CF_Mini_Blog::factory();
 		$this->per_page = $this->get_items_per_page('cf_mini_blog_items_per_page', 10); // number of items per table page
+		$this->meta_output = apply_filters('cf_miniblog_meta_output', array(
+			'leaderboard_code' => array(
+				'slug' => 'leaderboard_code',
+				'label' => __('Leaderboard Ad Code', 'cf_mini_blog'),
+				'type' => 'textarea',
+			),
+			'analytics_code' => array(
+				'slug' => 'analytics_code',
+				'label' => __('Analytics Code', 'cf_mini_blog'),
+				'type' => 'textarea',
+			),
+			'mobile_ad_code' => array(
+				'slug' => 'mobile_ad_code',
+				'label' => __('Mobile Ad Code', 'cf_mini_blog'),
+				'type' => 'textarea',
+			),
+			'exclude_on_home' => array(
+				'slug' => 'exclude_on_home',
+				'label' => __('Exclude posts from Home Page?', 'cf_mini_blog'),
+				'type' => 'checkbox',
+			),
+			'dark_theme' => array(
+				'slug' => 'dark_theme',
+				'label' => __('Use Dark Theme?', 'cf_mini_blog'),
+				'type' => 'checkbox',
+			),
+			'image_only_excerpts' => array(
+				'slug' => 'image_only_excerpts',
+				'label' => __('Use Image-only excerpts?', 'cf_mini_blog'),
+				'type' => 'checkbox',
+			),
+		));
 
 		$args = array(
 			'plural' 	=> __('Mini-Blogs', 'cf_mini_blog'),
@@ -191,7 +223,7 @@ class CF_Mini_blog_List_Table extends WP_List_Table {
 							<h4><?php echo $item->name; ?></h4>
 							<p class="cfmb-inp-group">
 								<label for="image-<?php echo $item->term_id; ?>"><?php echo esc_html('Custom Image', 'cf_mini_blog'); ?></label>
-								<?php 
+								<?php
 								$thumb_id = $this->controller->get_mini_blog_meta($item->term_id, 'thumbnail');
 								if (!empty($thumb_id)) {
 									$args = array(
@@ -217,30 +249,11 @@ class CF_Mini_blog_List_Table extends WP_List_Table {
 					</div>
 					<div class="cfmb-inline-edit-col-e">
 						<div class="inline-edit-col">
-							<p class="cfmb-inp-group">
-								<label for="leaderboard_code-<?php echo $item->term_id; ?>"><?php echo apply_filters(cfmb_leaderboard_label, esc_html('Leaderboard Ad Code', 'cf_mini_blog')); ?></label>
-								<textarea name="leaderboard_code-<?php echo $item->term_id; ?>" id="leaderboard_code-<?php echo $item->term_id?>"><?php echo esc_textarea($this->controller->get_mini_blog_meta($item->term_id, 'leaderboard_code')); ?></textarea>
-							</p>
-							<p class="cfmb-inp-group">
-								<label for="analytics_code-<?php echo $item->term_id; ?>"><?php echo esc_html('Analytics Code', 'cf_mini_blog'); ?></label>
-								<textarea name="analytics_code-<?php echo $item->term_id; ?>" id="analytics_code-<?php echo $item->term_id?>"><?php echo esc_textarea($this->controller->get_mini_blog_meta($item->term_id, 'analytics_code')); ?></textarea>
-							</p>
-							<p class="cfmb-inp-group">
-								<label for="mobile_ad_code-<?php echo $item->term_id; ?>"><?php echo esc_html('Mobile Ad Code', $this->i18n); ?></label>
-								<textarea name="mobile_ad_code-<?php echo $item->term_id; ?>" id="mobile_ad_code-<?php echo $item->term_id?>"><?php echo esc_textarea($this->controller->get_mini_blog_meta($item->term_id, 'mobile_ad_code')); ?></textarea>
-							</p>
-							<p class="cfmb-inp-group label-inline">
-								<input type="checkbox" value="1" name="exclude_on_home-<?php echo $item->term_id; ?>" id="exclude_on_home-<?php echo $item->term_id?>"<?php checked(1, $this->controller->get_mini_blog_meta($item->term_id, 'exclude_on_home')); ?> />
-								<label for="exclude_on_home-<?php echo $item->term_id; ?>"><?php echo esc_html('Exclude posts from Home Page?', 'cf_mini_blog'); ?></label>
-							</p>
-							<p class="cfmb-inp-group label-inline">
-								<input type="checkbox" value="1" name="dark_theme-<?php echo $item->term_id; ?>" id="dark_theme-<?php echo $item->term_id?>"<?php checked(1, $this->controller->get_mini_blog_meta($item->term_id, 'dark_theme')); ?> />
-								<label for="dark_theme-<?php echo $item->term_id; ?>"><?php echo esc_html('Use Dark Theme?', $this->i18n); ?></label>
-							</p>
-							<p class="cfmb-inp-group label-inline">
-								<input type="checkbox" value="1" name="image_only_excerpts-<?php echo $item->term_id; ?>" id="image_only_excerpts-<?php echo $item->term_id?>"<?php checked(1, $this->controller->get_mini_blog_meta($item->term_id, 'image_only_excerpts')); ?> />
-								<label for="image_only_excerpts-<?php echo $item->term_id; ?>"><?php echo esc_html('Use Image-only excerpts?', $this->i18n); ?></label>
-							</p>
+					<?php
+						foreach ($this->meta_output as $data) {
+							$this->_input_markup($data, $item);
+						}
+					?>
 						</div>
 					</div>
 
@@ -254,6 +267,69 @@ class CF_Mini_blog_List_Table extends WP_List_Table {
 			</td>
 		</tr>
 		<?php
+	}
+
+	function _input_markup($data, $item) {
+		if (!isset($data['type']) || !isset($data['slug']) || !isset($data['label']) || !method_exists($this, '_input_'.$data['type'])) {
+			return;
+		}
+		$function_name = '_input_'.$data['type'];
+
+		$this->$function_name($data, $item);
+
+	}
+
+	function _input_textarea($data, $item) {
+		if (!isset($data['slug']) || !isset($data['label'])) {
+			return;
+		}
+		$slug = trim($data['slug']);
+		$label = trim($data['label']);
+?>
+			<p class="cfmb-inp-group">
+				<label for="<?php echo esc_attr($slug.'-'.$item->term_id); ?>"><?php echo esc_html($label); ?></label>
+				<textarea name="<?php echo esc_attr($slug.'-'.$item->term_id); ?>" id="<?php echo esc_attr($slug.'-'.$item->term_id); ?>"><?php echo esc_textarea($this->controller->get_mini_blog_meta($item->term_id, $slug)); ?></textarea>
+			</p>
+<?php
+	}
+
+	function _input_text($data, $item) {
+		if (!isset($data['slug']) || !isset($data['label'])) {
+			return;
+		}
+		$slug = trim($data['slug']);
+		$label = trim($data['label']);
+
+?>
+		<p class="cfmb-inp-group label-inline">
+			<label for="<?php echo esc_attr($slug.'-'.$item->term_id); ?>"><?php echo $label; ?></label>
+			<input type="text" name="<?php echo esc_attr($slug.'-'.$item->term_id); ?>" id="<?php echo esc_attr($slug.'-'.$item->term_id); ?>" value="<?php echo esc_attr($this->controller->get_mini_blog_meta($item->term_id, $slug)); ?>" />
+		</p>
+<?php
+	}
+
+	function _input_checkbox($data, $item) {
+		if (!isset($data['slug']) || !isset($data['label'])) {
+			return;
+		}
+
+		$slug = trim($data['slug']);
+		$label = trim($data['label']);
+?>
+		<p class="cfmb-inp-group label-inline">
+			<input type="checkbox" value="1" name="<?php echo esc_attr($slug.'-'.$item->term_id); ?>" id="<?php echo esc_attr($slug.'-'.$item->term_id); ?>"<?php checked(1, $this->controller->get_mini_blog_meta($item->term_id, $slug)); ?> />
+			<label for="<?php echo esc_attr($slug.'-'.$item->term_id); ?>"><?php echo $label; ?></label>
+		</p>
+<?php
+	}
+
+	function _input_hidden($data, $item) {
+		if (!isset($data['slug']) || !isset($data['label'])) {
+			return;
+		}
+?>
+	<input type="hidden" value="<?php echo esc_attr($this->controller->get_mini_blog_meta($item->term_id, $slug)); ?>" name="<?php echo esc_attr($slug.'-'.$item->term_id); ?>" />
+<?php
 	}
 }
 ?>
