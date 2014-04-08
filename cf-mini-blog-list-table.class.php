@@ -50,7 +50,6 @@ class CF_Mini_blog_List_Table extends WP_List_Table {
 		}
 	}
 
-
 	/**
 	 * Return the friendly (i18n'd) name for a column
 	 *
@@ -64,7 +63,6 @@ class CF_Mini_blog_List_Table extends WP_List_Table {
 		}
 		return '';
 	}
-
 
 	/**
 	 * Returns the information for the specific item (row)
@@ -101,7 +99,6 @@ class CF_Mini_blog_List_Table extends WP_List_Table {
 		return apply_filters('cfmb_table_column_content', $content, compact('item', 'column_name'));
 	}
 
-
 	/**
 	 * Return *all* columns (even if hidden)
 	 *
@@ -118,7 +115,6 @@ class CF_Mini_blog_List_Table extends WP_List_Table {
 		return $columns;
 	}
 
-
 	/**
 	 * Return the slugs of the hidden columns
 	 *
@@ -131,7 +127,6 @@ class CF_Mini_blog_List_Table extends WP_List_Table {
 		return $hidden;
 	}
 
-
 	/**
 	 * Return the slugs of the sortable columns
 	 *
@@ -140,7 +135,6 @@ class CF_Mini_blog_List_Table extends WP_List_Table {
 	function get_sortable_columns() {
 		return array();
 	}
-
 
 	/**
 	 * Big 'ol function to get the table's data, so the
@@ -276,7 +270,6 @@ class CF_Mini_blog_List_Table extends WP_List_Table {
 		$function_name = '_input_'.$data['type'];
 
 		$this->$function_name($data, $item);
-
 	}
 
 	function _input_textarea($data, $item) {
@@ -332,4 +325,3 @@ class CF_Mini_blog_List_Table extends WP_List_Table {
 <?php
 	}
 }
-?>

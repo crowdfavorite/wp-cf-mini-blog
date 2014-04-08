@@ -739,6 +739,8 @@ class CF_Mini_Blog {
 						}
 					}
 
+					$data['thumbnail'] = isset($thumbnail) ? $thumbnail : 0;
+
 					$result = $this->save_mini_blog_meta($id, $data);
 
 					if (!is_wp_error($result)) {
@@ -945,6 +947,7 @@ class CF_Mini_Blog {
 			'exclude_on_home' => 0,
 			'dark_theme' => 0,
 			'image_only_excerpts' => 0,
+			'thumbnail' => 0,
 		));
 		$meta = array_merge($default_meta, $meta);
 
