@@ -52,7 +52,7 @@ class CF_Mini_Blog {
 		else {
         		$this->url = trailingslashit(plugin_dir_url(__FILE__));
 		}
-		
+
 		$this->primary_meta_key = '_cfmb_primary_mb';
 		$this->action = 'cf_mini_blog_action';
 		$this->taxonomy = 'cf_mini_blog';
@@ -181,7 +181,7 @@ class CF_Mini_Blog {
 		foreach ($types as $type) {
 			add_meta_box('cfmb_mini_blogs', __('Mini-Blogs', 'cf_mini_blog'), array($this, 'output_mini_blogs_meta_box'), $type, 'side');
 		}
-		
+
 	}
 
 	/**
@@ -202,17 +202,17 @@ class CF_Mini_Blog {
 			'hide_empty' => false,
 		));
 		$inactive = $this->get_inactive_mini_blogs();
-		
+
 		if ($this->get_setting('select_multiple')) {
 			$primary = get_post_meta($post->ID, $this->primary_meta_key, true);
 ?>
 	<p><?php _e('Select Mini-Blogs to associate to this post.', 'cf_mini_blog'); ?></p>
 	<div class="categorydiv">
-		<label for="cfmb-primary"> 
+		<label for="cfmb-primary">
 			<?php _e('Primary Mini Blog ', 'cf_mini_blog');	 ?>
 			<select id="cfmb-primary" name="cfmb_mini_blog_primary" >
 				<option value="0"><?php _e('None', 'cf_mini_blog'); ?>
-				<?php 
+				<?php
 					foreach ($terms as $term) {
 						if (!in_array($term->term_id, $inactive)) {
 							echo '<option value="'.esc_attr($term->term_id).'"'.selected($term->term_id, $primary, false).'>'.esc_html($term->name).'</option>';
@@ -227,8 +227,8 @@ class CF_Mini_Blog {
 	<div id="<?php echo esc_attr('taxonomy-'.$this->taxonomy) ?>" class="<?php echo esc_attr($this->taxonomy.'div categorydiv'); ?>">
 		<div id="category-all" class="tabs-panel">
 			<input type="hidden" name="<?php echo $name; ?>" value="0">
-			<ul id="<?php echo esc_attr($this->taxonomy.'checklist'); ?>" data-wp-lists="<?php echo esc_attr('list:'.$this->taxonomy); ?>" class="categorychecklist form-no-clear">	
-				<?php 
+			<ul id="<?php echo esc_attr($this->taxonomy.'checklist'); ?>" data-wp-lists="<?php echo esc_attr('list:'.$this->taxonomy); ?>" class="categorychecklist form-no-clear">
+				<?php
 					foreach ($terms as $term) {
 						if (!in_array($term->term_id, $inactive)) {
 							echo '<li id="'.esc_attr($this->taxonomy.'-'.$term->term_id).'">
@@ -242,25 +242,25 @@ class CF_Mini_Blog {
 			</ul>
 		</div>
 	</div>
-<?php 
-		} 
+<?php
+		}
 		else {
-		
+
 		// Only one can be selected here
 			$selected = is_array($selected) ? array_shift($selected) : 0;
 		?>
-		
+
 	<p><?php _e('Select a Mini-Blog to associate to this post.', 'cf_mini_blog'); ?></p>
 	<select name="cfmb_mini_blog_dropdown" id="cfmb_mini_blog_dropdown" class="postform">
 		<option value="-1"><?php _e('&mdash; Please Select &mdash;', 'cf_mini_blog'); ?></option>
-		<?php 
+		<?php
 			foreach ($terms as $term) {
 				if (!in_array($term->term_id, $inactive)) {
 					echo '<option value="'.esc_attr($term->term_id).'"'.selected($selected, $term->term_id, false).'>'.esc_html($term->name).'</option>';
 				}
 			}
 		 ?>
-	</select>		
+	</select>
 		<?php
 		}
 	}
@@ -281,7 +281,7 @@ class CF_Mini_Blog {
 			// Assign the term
 			wp_set_post_terms($post_id, array($mb_id), $this->taxonomy);
 		}
-		else if ($post->post_type == 'post' && isset($_POST['cfmb_mini_blog_primary'])) { 
+		else if ($post->post_type == 'post' && isset($_POST['cfmb_mini_blog_primary'])) {
 			$mb_id = intval($_POST['cfmb_mini_blog_primary']);
 			// Assign the term
 			wp_set_post_terms($post_id, array($mb_id), $this->taxonomy, true);
@@ -498,7 +498,7 @@ class CF_Mini_Blog {
 			<?php screen_icon(); ?>
 
 			<h2><?php _e('Mini-Blog Administration', 'cf_mini_blog'); ?></h2>
-			
+
 			<?php
 			// Output the form to add new Mini-Blogs
 			$this->output_new_term_form();
@@ -530,7 +530,7 @@ class CF_Mini_Blog {
 
 		</form>
 		<form action="<?php echo esc_url(admin_url()); ?>" method="post">
-		
+
 			<?php $this->output_hidden_form_fields('add_new_term'); ?>
 
 			<h3><?php _e('Add a New Mini-Blog', 'cf_mini_blog'); ?></h3>
@@ -650,7 +650,7 @@ class CF_Mini_Blog {
 
 					// Stay on the same page
 					$args['paged'] = $this->get_pagenum();
-					
+
 					// Actually redirect
 					wp_redirect(add_query_arg($args, $this->menu_page_url));
 					break;
@@ -723,22 +723,25 @@ class CF_Mini_Blog {
 					}
 
 					// @TODO need to allow javascript, but not HTML?
-					$leaderboard_code = stripslashes($_POST['leaderboard_code-'.$id]);
-					$analytics_code = stripslashes($_POST['analytics_code-'.$id]);
-					$mobile_ad_code = stripslashes($_POST['mobile_ad_code-'.$id]);
-					$exclude_on_home = empty($_POST['exclude_on_home-'.$id]) ? 0 : 1;
-					$dark_theme = empty($_POST['dark_theme-'.$id]) ? 0 : 1;
-					$image_only_excerpts = empty($_POST['image_only_excerpts-'.$id]) ? 0 : 1;
-
-					$result = $this->save_mini_blog_meta($id, compact(
+					$meta_to_save = apply_filters('cf_miniblog_meta_to_save', array(
 						'leaderboard_code',
-						'mobile_ad_code',
 						'analytics_code',
-						'thumbnail',
+						'mobile_ad_code',
 						'exclude_on_home',
 						'dark_theme',
-						'image_only_excerpts'
+						'image_only_excerpts',
 					));
+
+					$data = array();
+					foreach ($meta_to_save as $meta_key) {
+						if (isset($_POST[$meta_key.'-'.$id])) {
+							$data[$meta_key] = $_POST[$meta_key.'-'.$id];
+						}
+					}
+
+					$data['thumbnail'] = isset($thumbnail) ? $thumbnail : 0;
+
+					$result = $this->save_mini_blog_meta($id, $data);
 
 					if (!is_wp_error($result)) {
 						$args = array(
@@ -831,7 +834,7 @@ class CF_Mini_Blog {
 
 					// Simple sanitize
 					if (!method_exists($this, $func_name)) {
-						wp_die(sprintf(__("Called a bad method: %s", 'cf_mini_blog'), 
+						wp_die(sprintf(__("Called a bad method: %s", 'cf_mini_blog'),
 							'CF_Mini_Blog::'.$func_name
 						));
 					}
@@ -937,11 +940,15 @@ class CF_Mini_Blog {
 	 * @return bool | WP_Error
 	 */
 	public function save_mini_blog_meta($mini_blog_term_id, $meta = array()) {
-		$default_meta = array(
+		$default_meta = apply_filters('cf_miniblog_meta_defaults', array(
 			'leaderboard_code' => '',
 			'analytics_code' => '',
 			'mobile_ad_code' => '',
-		);
+			'exclude_on_home' => 0,
+			'dark_theme' => 0,
+			'image_only_excerpts' => 0,
+			'thumbnail' => 0,
+		));
 		$meta = array_merge($default_meta, $meta);
 
 		// Look up our Mini-Blog post-type so we can get the post meta
@@ -1207,14 +1214,14 @@ class CF_Mini_Blog {
 		// Conditionally add the (de)activate actions
 		if ($this->is_mini_blog_active($mini_blog)) {
 			$actions['deactivate'] = __('Deactivate', 'cf_mini_blog');
-		} 
+		}
 		else {
 			$actions['activate'] = __('Activate', 'cf_mini_blog');
 		}
 
 		// Add the delete action to the end of the $actions
 		$actions['delete'] = __('Delete', 'cf_mini_blog');
-		
+
 		$links = array();
 		foreach ($actions as $action => $text) {
 			switch ($action) {
