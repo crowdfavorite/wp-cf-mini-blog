@@ -224,7 +224,7 @@ class CF_Mini_Blog {
 		</label>
 	</div>
 	<p></p>
-	<div id="<?php echo esc_attr('taxonomy-'.$this->taxonomy) ?>" class="<?php echo esc_attr($this->taxonomy.'div categorydiv'); ?>">
+	<div id="<?php echo esc_attr('taxonomy-'.$this->taxonomy) ?>" class="<?php echo esc_attr($this->taxonomy.'div'); ?>">
 		<div id="category-all" class="tabs-panel">
 			<input type="hidden" name="<?php echo $name; ?>" value="0">
 			<ul id="<?php echo esc_attr($this->taxonomy.'checklist'); ?>" data-wp-lists="<?php echo esc_attr('list:'.$this->taxonomy); ?>" class="categorychecklist form-no-clear">
