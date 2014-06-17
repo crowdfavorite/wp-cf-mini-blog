@@ -209,7 +209,7 @@ class CF_Mini_Blog {
 	<p><?php _e('Select Mini-Blogs to associate to this post.', 'cf_mini_blog'); ?></p>
 	<div>
 		<label for="cfmb-primary">
-			<p><?php _e('Primary Mini blog ', 'cf_mini_blog'); ?></p>
+			<p><?php _e('Primary Mini Blog ', 'cf_mini_blog'); ?></p>
 			<select id="cfmb-primary" name="cfmb_mini_blog_primary" >
 				<option value="0"><?php _e('None', 'cf_mini_blog'); ?>
 				<?php
