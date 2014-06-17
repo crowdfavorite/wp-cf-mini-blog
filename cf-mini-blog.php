@@ -209,7 +209,7 @@ class CF_Mini_Blog {
 	<p><?php _e('Select Mini-Blogs to associate to this post.', 'cf_mini_blog'); ?></p>
 	<div>
 		<label for="cfmb-primary">
-			<?php _e('Primary Mini Blog ', 'cf_mini_blog');	 ?>
+			<p><?php _e('Primary Mini blog ', 'cf_mini_blog'); ?></p>
 			<select id="cfmb-primary" name="cfmb_mini_blog_primary" >
 				<option value="0"><?php _e('None', 'cf_mini_blog'); ?>
 				<?php
@@ -225,8 +225,10 @@ class CF_Mini_Blog {
 	</div>
 	<p></p>
 	<div id="<?php echo esc_attr('taxonomy-'.$this->taxonomy) ?>" class="<?php echo esc_attr($this->taxonomy.'div'); ?>">
+
 		<div id="category-all" class="tabs-panel">
 			<input type="hidden" name="<?php echo $name; ?>" value="0">
+			<p><?php _e('Secondary Mini Blogs ', 'cf_mini_blog'); ?></p>
 			<ul id="<?php echo esc_attr($this->taxonomy.'checklist'); ?>" data-wp-lists="<?php echo esc_attr('list:'.$this->taxonomy); ?>" class="categorychecklist form-no-clear">
 				<?php
 					foreach ($terms as $term) {
