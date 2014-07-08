@@ -42,12 +42,20 @@ class CF_Mini_blog_List_Table extends WP_List_Table {
 			'ajax'		=> true,
 		);
 
-		if (method_exists(parent, 'WP_List_Table')) {
-			parent::WP_List_Table($args);
-		}
-		else {
+
+		/**
+		 * Provisional code removal below due to WP-Engine's request for removal due to a PHP bug: 
+		 *
+		 * The cf-mini-blog plugin that you are using is exercising a bug in PHP + Zend Guard Loader. 
+		 * The bug is currently open with PHP and can be found here https://bugs.php.net/bug.php?id=51425.
+		 */
+
+		//if (method_exists(parent, 'WP_List_Table')) {
+		//	parent::WP_List_Table($args);
+		//}
+		//else {
 			parent::__construct($args);
-		}
+		//}
 	}
 
 	/**
