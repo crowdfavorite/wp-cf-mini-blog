@@ -1,6 +1,10 @@
 <?php
 class CF_Mini_blog_List_Table extends WP_List_Table {
 	function __construct() {
+
+		// 4.0.0 introduced the requirement of naming private properties for getter and setters
+		$this->compat_fields = array('controller', 'meta_output', 'per_page');
+
 		$this->controller = CF_Mini_Blog::factory();
 		$this->per_page = $this->get_items_per_page('cf_mini_blog_items_per_page', 10); // number of items per table page
 		$this->meta_output = apply_filters('cf_miniblog_meta_output', array(
@@ -44,9 +48,9 @@ class CF_Mini_blog_List_Table extends WP_List_Table {
 
 
 		/**
-		 * Provisional code removal below due to WP-Engine's request for removal due to a PHP bug: 
+		 * Provisional code removal below due to WP-Engine's request for removal due to a PHP bug:
 		 *
-		 * The cf-mini-blog plugin that you are using is exercising a bug in PHP + Zend Guard Loader. 
+		 * The cf-mini-blog plugin that you are using is exercising a bug in PHP + Zend Guard Loader.
 		 * The bug is currently open with PHP and can be found here https://bugs.php.net/bug.php?id=51425.
 		 */
 
