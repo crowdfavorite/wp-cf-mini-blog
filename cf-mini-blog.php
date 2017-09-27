@@ -73,7 +73,7 @@ class CF_Mini_Blog {
 		);
 	}
 
-	public function factory() {
+	public static function factory() {
 		if (!isset(self::$instance)) {
 			self::$instance = new CF_Mini_Blog;
 		}
